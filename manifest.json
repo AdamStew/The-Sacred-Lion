@@ -1,0 +1,7 @@
+{
+  "name": "the-sacred-lion",
+  "short_name": "the-sacred-lion",
+  "description": "Web application to organize board game events.",
+  "start_url": "/",
+  "display": "standalone"
+}

@@ -1,0 +1,29 @@
+{
+  "name": "the-sacred-lion",
+  "version": "1.0.0",
+  "description": "Web application to organize board game events.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AdamStew/The-Sacred-Lion.git"
+  },
+  "keywords": [
+    "sacred",
+    "lion"
+  ],
+  "author": "Adam Stewart, Devin O'Connor, Jarod Hanko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AdamStew/The-Sacred-Lion/issues"
+  },
+  "homepage": "https://github.com/AdamStew/The-Sacred-Lion#readme",
+  "dependencies": {
+    "redux": "^3.7.2"
+  }
+}
