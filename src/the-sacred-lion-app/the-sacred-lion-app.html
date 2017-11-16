@@ -24,11 +24,11 @@
         api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
         auth-domain="the-sacred-lion.firebaseapp.com"
         database-url="https://the-sacred-lion.firebaseio.com"
-        storage-bucket=""
+        storage-bucket="the-sacred-lion.appspot.com"
         messaging-sender-id=74198786972">
         </firebase-app>
 
-        <firebase-auth id="auth" user="{{user}}" provider="google" on-error="handleError"></firebase-auth>
+        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="catchError"></firebase-auth>
 
         <div id="logInButtons">
             <paper-button id="logIn" on-click="openLogInDia">Log In</paper-button>
@@ -39,18 +39,18 @@
             <paper-dialog id="logInDia" modal on-iron-overlay-closed="diaClosed">
                 <div class="inputs">
                     <paper-input id="logInEmail" label="Email"></paper-input>
-                    <paper-input id="logInPassword" label="Password"></paper-input>
+                    <paper-input id="logInPassword" type="password" label="Password"></paper-input>
                 </div>
                 <div class="buttons">
-                    <paper-button dialog-confirms>Login</paper-button>
+                    <paper-button dialog-confirm>Login</paper-button>
                     <paper-button dialog-dismiss>Cancel</paper-button>
                 </div>
             </paper-dialog>
             <paper-dialog id="signUpDia" modal on-iron-overlay-closed="diaClosed">
                 <div class="inputs">
                     <paper-input id="signUpEmail" label="Email"></paper-input>
-                    <paper-input id="signUpPassword" label="Password"></paper-input>
-                    <paper-input id="passwordConfirm" label="Password Confirmation"></paper-input>
+                    <paper-input id="signUpPassword" type="password" label="Password"></paper-input>
+                    <paper-input id="passwordConfirm" type="password" label="Password Confirmation"></paper-input>
                 </div>
                 <div class="buttons">
                     <paper-button dialog-confirm>Sign Up</paper-button>
@@ -94,13 +94,26 @@
             diaClosed() { // dialog close handler
                 if(this.$.logInDia.closingReason.confirmed){
                     //Do stuff for logging in.
-                    this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value, this.$.logInPassword.value);
+                    if(this.$.logInEmail.value != null && this.$.logInPassword.value != null) {
+                        this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
+                            this.$.logInPassword.value.trim()).then(function(response) {
+                                this.$.logIn.visibility = "hidden";
+                                this.$.logIn.disabled = true;
+                                this.$.signUp.visibility = "hidden";
+                                this.$.signUp.disabled = true;
+                            //console.log("Hello " + response.user.displayName);
+                        });
+                    }
                 } else if(this.$.signUpDia.closingReason.confirmed) {
                     //Do stuff for signing up.
-                    console.log("Username: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
-                    if(this.$.signUpPassword.value == this.$.passwordConfirm) {
-                        this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value,
-                            this.$.signUpPassword.value);
+                    if(this.$.signUpEmail.value != null && this.$.signUpPassword.value != null &&
+                        this.$.passwordConfirm != null) {
+                        //console.log("USERNAME: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
+                        if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
+                            console.log("Passwords match!");
+                            this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
+                                this.$.signUpPassword.value.trim());
+                        }
                     }
 
                 }
@@ -108,9 +121,10 @@
 
             static get properties() {
                 return {
-                    prop1: {
-                        type: String,
-                        value: 'the-sacred-lion-app'
+                    user: {
+                        type: Object,
+                        notify: true,
+                        value: false
                     }
                 };
             }
