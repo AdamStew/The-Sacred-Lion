@@ -38,23 +38,23 @@
         <div>
             <paper-dialog id="logInDia" modal on-iron-overlay-closed="diaClosed">
                 <div class="inputs">
-                    <paper-input id="email" label="Email"></paper-input>
-                    <paper-input id="password" label="Password"></paper-input>
+                    <paper-input id="logInEmail" label="Email"></paper-input>
+                    <paper-input id="logInPassword" label="Password"></paper-input>
                 </div>
                 <div class="buttons">
-                    <paper-button dialog-dismiss>Login</paper-button>
-                    <paper-button dialog-confirm>Cancel</paper-button>
+                    <paper-button dialog-confirms>Login</paper-button>
+                    <paper-button dialog-dismiss>Cancel</paper-button>
                 </div>
             </paper-dialog>
             <paper-dialog id="signUpDia" modal on-iron-overlay-closed="diaClosed">
                 <div class="inputs">
-                    <paper-input id="email" label="Email"></paper-input>
-                    <paper-input id="password" label="Password"></paper-input>
+                    <paper-input id="signUpEmail" label="Email"></paper-input>
+                    <paper-input id="signUpPassword" label="Password"></paper-input>
                     <paper-input id="passwordConfirm" label="Password Confirmation"></paper-input>
                 </div>
                 <div class="buttons">
-                    <paper-button dialog-dismiss>Sign Up</paper-button>
-                    <paper-button dialog-confirm>Cancel</paper-button>
+                    <paper-button dialog-confirm>Sign Up</paper-button>
+                    <paper-button dialog-dismiss>Cancel</paper-button>
                 </div>
             </paper-dialog>
         </div>
@@ -94,8 +94,15 @@
             diaClosed() { // dialog close handler
                 if(this.$.logInDia.closingReason.confirmed){
                     //Do stuff for logging in.
+                    this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value, this.$.logInPassword.value);
                 } else if(this.$.signUpDia.closingReason.confirmed) {
                     //Do stuff for signing up.
+                    console.log("Username: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
+                    if(this.$.signUpPassword.value == this.$.passwordConfirm) {
+                        this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value,
+                            this.$.signUpPassword.value);
+                    }
+
                 }
             }
 
