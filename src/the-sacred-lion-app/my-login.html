@@ -1,0 +1,141 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-request.html">
+<link rel="import" href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/good-map/good-map.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="shared-styles.html">
+
+
+<dom-module id="my-login">
+    <template>
+
+        <firebase-app id="myFireApp"
+            api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
+            auth-domain="the-sacred-lion.firebaseapp.com"
+            database-url="https://the-sacred-lion.firebaseio.com"
+            storage-bucket="the-sacred-lion.appspot.com"
+            messaging-sender-id="74198786972">
+        </firebase-app>
+
+        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="catchError"></firebase-auth>
+
+        <div class="card">
+            <div id="logInButtons">
+                <paper-button id="logIn" on-click="openLogInDia">Log In</paper-button>
+                <paper-button id="signUp" on-click="openSignUpDia">Sign Up</paper-button>
+            </div>
+
+            <div>
+                <paper-dialog id="logInDia" on-iron-overlay-closed="diaClosed">
+                    <div class="inputs">
+                        <paper-input id="logInEmail" label="Email"></paper-input>
+                        <paper-input id="logInPassword" type="password" label="Password"></paper-input>
+                    </div>
+                    <div class="buttons">
+                        <paper-button dialog-confirm>Login</paper-button>
+                        <paper-button dialog-dismiss>Cancel</paper-button>
+                    </div>
+                </paper-dialog>
+                <paper-dialog id="signUpDia" on-iron-overlay-closed="diaClosed">
+                    <div class="inputs">
+                        <paper-input id="signUpEmail" label="Email"></paper-input>
+                        <paper-input id="signUpPassword" type="password" label="Password"></paper-input>
+                        <paper-input id="passwordConfirm" type="password" label="Password Confirmation"></paper-input>
+                    </div>
+                    <div class="buttons">
+                        <paper-button dialog-confirm>Sign Up</paper-button>
+                        <paper-button dialog-dismiss>Cancel</paper-button>
+                    </div>
+                </paper-dialog>
+            </div>
+        </div>
+
+        <style>
+            :host {
+                display: block;
+            }
+            #logInButtons {
+                /* This shit basically centers it. */
+                position: fixed;
+                width: 20%;
+                z-index: 2;
+                top: 50%;
+                left: 50%;
+                margin-top: -10%;
+                margin-left: -10%;
+            }
+
+        </style>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse"></style>
+    </template>
+
+    <script>
+        /**
+         * @customElement
+         * @polymer
+         */
+        class MyLogin extends Polymer.Element {
+            static get is() { return 'my-login'; }
+            openLogInDia() {
+                this.$.logInDia.open();
+            }
+            openSignUpDia() {
+                this.$.signUpDia.open();
+            }
+            diaClosed() { // dialog close handler
+                if(this.$.logInDia.closingReason.confirmed){
+                    //Do stuff for logging in.
+                    if(this.$.logInEmail.value != null && this.$.logInPassword.value != null) {
+                        this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
+                            this.$.logInPassword.value.trim())
+                            .then(function(response) {
+                                this.$.logIn.visibility = "hidden";
+                                this.$.logIn.disabled = true;
+                                this.$.signUp.visibility = "hidden";
+                                this.$.signUp.disabled = true;
+                                location.href = "/view1";
+                                //console.log("Hello " + response.user.displayName);
+                            }.bind(this));
+                    }
+                } else if(this.$.signUpDia.closingReason.confirmed) {
+                    //Do stuff for signing up.
+                    if(this.$.signUpEmail.value != null && this.$.signUpPassword.value != null &&
+                        this.$.passwordConfirm != null) {
+                        //console.log("USERNAME: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
+                        if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
+                            console.log("Passwords match!");
+                            this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
+                                this.$.signUpPassword.value.trim());
+                        }
+                    }
+
+                }
+            }
+
+            static get properties() {
+                return {
+                    user: {
+                        type: Object,
+                        notify: true,
+                        value: false
+                    }
+                };
+            }
+        }
+
+        window.customElements.define(MyLogin.is, MyLogin);
+    </script>
+</dom-module>

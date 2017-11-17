@@ -1,135 +1,168 @@
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-request.html">
-<link rel="import" href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
-<link rel="import" href="../../bower_components/paper-card/paper-card.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
-<link rel="import" href="../../bower_components/google-map/google-map.html">
-<link rel="import" href="../../bower_components/good-map/good-map.html">
-<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="my-icons.html">
+
+<link rel="lazy-import" href="my-login.html">
+<link rel="lazy-import" href="my-view1.html">
+<link rel="lazy-import" href="my-view2.html">
+<link rel="lazy-import" href="my-view3.html">
+<link rel="lazy-import" href="my-view404.html">
 
 <dom-module id="the-sacred-lion-app">
     <template>
-
-        <firebase-app id="myFireApp"
-        api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
-        auth-domain="the-sacred-lion.firebaseapp.com"
-        database-url="https://the-sacred-lion.firebaseio.com"
-        storage-bucket="the-sacred-lion.appspot.com"
-        messaging-sender-id=74198786972">
-        </firebase-app>
-
-        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="catchError"></firebase-auth>
-
-        <div id="logInButtons">
-            <paper-button id="logIn" on-click="openLogInDia">Log In</paper-button>
-            <paper-button id="signUp" on-click="openSignUpDia">Sign Up</paper-button>
-        </div>
-
-        <div>
-            <paper-dialog id="logInDia" modal on-iron-overlay-closed="diaClosed">
-                <div class="inputs">
-                    <paper-input id="logInEmail" label="Email"></paper-input>
-                    <paper-input id="logInPassword" type="password" label="Password"></paper-input>
-                </div>
-                <div class="buttons">
-                    <paper-button dialog-confirm>Login</paper-button>
-                    <paper-button dialog-dismiss>Cancel</paper-button>
-                </div>
-            </paper-dialog>
-            <paper-dialog id="signUpDia" modal on-iron-overlay-closed="diaClosed">
-                <div class="inputs">
-                    <paper-input id="signUpEmail" label="Email"></paper-input>
-                    <paper-input id="signUpPassword" type="password" label="Password"></paper-input>
-                    <paper-input id="passwordConfirm" type="password" label="Password Confirmation"></paper-input>
-                </div>
-                <div class="buttons">
-                    <paper-button dialog-confirm>Sign Up</paper-button>
-                    <paper-button dialog-dismiss>Cancel</paper-button>
-                </div>
-            </paper-dialog>
-        </div>
-
         <style>
-            :host {
-                display: block;
-            }
-            #logInButtons {
-                /* This shit basically centers it. */
-                position: fixed;
-                width: 20%;
-                z-index: 2;
-                top: 50%;
-                left: 50%;
-                margin-top: -10%;
-                margin-left: -10%;
-            }
-
+          :host {
+            --app-primary-color: #4285f4;
+            --app-secondary-color: black;
+    
+            display: block;
+          }
+    
+          app-drawer-layout:not([narrow]) [drawer-toggle] {
+            display: none;
+          }
+    
+          app-header {
+            color: #fff;
+            background-color: var(--app-primary-color);
+          }
+    
+          app-header paper-icon-button {
+            --paper-icon-button-ink-color: white;
+          }
+    
+          .drawer-list {
+            margin: 0 20px;
+          }
+    
+          .drawer-list a {
+            display: block;
+            padding: 0 16px;
+            text-decoration: none;
+            color: var(--app-secondary-color);
+            line-height: 40px;
+          }
+    
+          .drawer-list a.iron-selected {
+            color: black;
+            font-weight: bold;
+          }
         </style>
-    </template>
-
-    <style include="iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse"></style>
-    <script>
-        /**
-         * @customElement
-         * @polymer
-         */
+    
+        <app-location
+            route="{{route}}"
+            url-space-regex="^[[rootPath]]">
+        </app-location>
+    
+        <app-route
+            route="{{route}}"
+            pattern="[[rootPath]]:page"
+            data="{{routeData}}"
+            tail="{{subroute}}">
+        </app-route>
+    
+        <app-drawer-layout fullbleed narrow="{{narrow}}">
+          <!-- Drawer content -->
+          <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+            <app-toolbar>Menu</app-toolbar>
+            <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+              <a name="login" href="[[rootPath]]login">Login</a>
+              <a name="view1" href="[[rootPath]]view1">View One</a>
+              <a name="view2" href="[[rootPath]]view2">View Two</a>
+              <a name="view3" href="[[rootPath]]view3">View Three</a>
+            </iron-selector>
+          </app-drawer>
+    
+          <!-- Main content -->
+          <app-header-layout has-scrolling-region>
+    
+            <app-header slot="header" condenses reveals effects="waterfall">
+              <app-toolbar>
+                <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+                <div main-title>The Sacred Lion</div>
+              </app-toolbar>
+            </app-header>
+    
+            <iron-pages
+                selected="[[page]]"
+                attr-for-selected="name"
+                fallback-selection="view404"
+                role="main">
+              <my-login name="login"></my-login>
+              <my-view1 name="view1"></my-view1>
+              <my-view2 name="view2"></my-view2>
+              <my-view3 name="view3"></my-view3>
+              <my-view404 name="view404"></my-view404>
+            </iron-pages>
+          </app-header-layout>
+        </app-drawer-layout>
+      </template>
+    
+      <script>
         class TheSacredLionApp extends Polymer.Element {
             static get is() { return 'the-sacred-lion-app'; }
-            openLogInDia() {
-                this.$.logInDia.open();
+    
+          static get properties() {
+            return {
+              page: {
+                type: String,
+                reflectToAttribute: true,
+                observer: '_pageChanged',
+              },
+              routeData: Object,
+              subroute: String,
+              // This shouldn't be neccessary, but the Analyzer isn't picking up
+              // Polymer.Element#rootPath
+              rootPath: String,
+            };
+          }
+    
+          static get observers() {
+            return [
+              '_routePageChanged(routeData.page)',
+            ];
+          }
+    
+          _routePageChanged(page) {
+            // If no page was found in the route data, page will be an empty string.
+            // Default to 'login' in that case.
+            this.page = page || 'login';
+    
+            // Close a non-persistent drawer when the page & route are changed.
+            if (!this.$.drawer.persistent) {
+              this.$.drawer.close();
             }
-            openSignUpDia() {
-                this.$.signUpDia.open();
-            }
-            diaClosed() { // dialog close handler
-                if(this.$.logInDia.closingReason.confirmed){
-                    //Do stuff for logging in.
-                    if(this.$.logInEmail.value != null && this.$.logInPassword.value != null) {
-                        this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
-                            this.$.logInPassword.value.trim()).then(function(response) {
-                                this.$.logIn.visibility = "hidden";
-                                this.$.logIn.disabled = true;
-                                this.$.signUp.visibility = "hidden";
-                                this.$.signUp.disabled = true;
-                            //console.log("Hello " + response.user.displayName);
-                        });
-                    }
-                } else if(this.$.signUpDia.closingReason.confirmed) {
-                    //Do stuff for signing up.
-                    if(this.$.signUpEmail.value != null && this.$.signUpPassword.value != null &&
-                        this.$.passwordConfirm != null) {
-                        //console.log("USERNAME: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
-                        if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
-                            console.log("Passwords match!");
-                            this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
-                                this.$.signUpPassword.value.trim());
-                        }
-                    }
-
-                }
-            }
-
-            static get properties() {
-                return {
-                    user: {
-                        type: Object,
-                        notify: true,
-                        value: false
-                    }
-                };
-            }
+          }
+    
+          _pageChanged(page) {
+            // Load page import on demand. Show 404 page if fails
+            var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+            Polymer.importHref(
+                resolvedPageUrl,
+                null,
+                this._showPage404.bind(this),
+                true);
+          }
+    
+          _showPage404() {
+            this.page = 'view404';
+          }
         }
-
+    
         window.customElements.define(TheSacredLionApp.is, TheSacredLionApp);
-    </script>
+      </script>
+</dom-module>
+
+
+<dom-module id="my-app">
+  
 </dom-module>
