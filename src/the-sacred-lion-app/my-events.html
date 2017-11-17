@@ -1,0 +1,26 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="my-events">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <div class="card">
+      <h1>Events</h1>
+    </div>
+  </template>
+
+  <script>
+    class MyEvents extends Polymer.Element {
+      static get is() { return 'my-events'; }
+    }
+
+    window.customElements.define(MyEvents.is, MyEvents);
+  </script>
+</dom-module>

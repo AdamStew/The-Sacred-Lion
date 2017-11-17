@@ -3,6 +3,12 @@
   "shell": "src/the-sacred-lion-app/my-app.html",
   "fragments": [
     "src/the-sacred-lion-app/my-login.html",
+    "src/the-sacred-lion-app/my-invites.html",
+    "src/the-sacred-lion-app/my-events.html",
+    "src/the-sacred-lion-app/my-private-profile.html",
+    "src/the-sacred-lion-app/my-public-profile.html",
+    "src/the-sacred-lion-app/my-user-list.html",
+    "src/the-sacred-lion-app/my-user-stats.html",
     "src/the-sacred-lion-app/my-view1.html",
     "src/the-sacred-lion-app/my-view2.html",
     "src/the-sacred-lion-app/my-view3.html",

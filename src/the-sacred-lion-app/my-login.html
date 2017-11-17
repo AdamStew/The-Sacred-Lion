@@ -37,6 +37,7 @@
                 <paper-button id="logIn" on-click="openLogInDia">Log In</paper-button>
                 <paper-button id="signUp" on-click="openSignUpDia">Sign Up</paper-button>
             </div>
+        </div>
 
             <div>
                 <paper-dialog id="logInDia" on-iron-overlay-closed="diaClosed">
@@ -61,7 +62,6 @@
                     </div>
                 </paper-dialog>
             </div>
-        </div>
 
         <style>
             :host {
@@ -88,7 +88,9 @@
          * @polymer
          */
         class MyLogin extends Polymer.Element {
-            static get is() { return 'my-login'; }
+            static get is() { 
+                return 'my-login'; 
+            }
             openLogInDia() {
                 this.$.logInDia.open();
             }
@@ -106,7 +108,7 @@
                                 this.$.logIn.disabled = true;
                                 this.$.signUp.visibility = "hidden";
                                 this.$.signUp.disabled = true;
-                                location.href = "/view1";
+                                location.href = "/user-stats";
                                 //console.log("Hello " + response.user.displayName);
                             }.bind(this));
                     }
