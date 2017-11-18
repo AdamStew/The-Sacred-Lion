@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-label/iron-label.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
@@ -30,8 +31,39 @@
             messaging-sender-id="74198786972">
         </firebase-app>
 
-        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="catchError"></firebase-auth>
+        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
 
+        <div id="allTableData">
+            <table id="logInMaterial">
+                <tr>
+                    <th>Log in</th>
+                    <th>Sign up</th>
+                </tr>
+                <tr>
+                    <td><paper-input id="logInEmail" label="Email" tabindex="1"></paper-input></td>
+                    <td><paper-input id="signUpEmail" label="Email" tabindex="3"></paper-input></td>
+                </tr>
+                <tr>
+                    <td><paper-input id="logInPassword" type="password" label="Password" tabindex="2"></paper-input></td>
+                    <td><paper-input id="signUpPassword" type="password" label="Password" tabindex="4"></paper-input></td>
+                </tr>
+                <tr>
+                    <td><!--Filler--></td>
+                    <td><paper-input id="passwordConfirm" type="password" label="Password Confirmation" tabindex="5">
+                    </paper-input></td>
+                </tr>
+                <tr>
+                    <td align="center"><paper-button id="logIn" on-click="logIn">Log In</paper-button></td>
+                    <td align="center"><paper-button id="signUp" on-click="signUp">Sign Up</paper-button></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <paper-dialog id="errorDia">
+                <iron-label><div id="errContents"></div></iron-label>
+            </paper-dialog>
+        </div>
+        <!--
         <div class="card">
             <div id="logInButtons">
                 <paper-button id="logIn" on-click="openLogInDia">Log In</paper-button>
@@ -61,13 +93,13 @@
                         <paper-button dialog-dismiss>Cancel</paper-button>
                     </div>
                 </paper-dialog>
-            </div>
+            </div> -->
 
         <style>
             :host {
                 display: block;
             }
-            #logInButtons {
+            #logInMaterial {
                 /* This shit basically centers it. */
                 position: fixed;
                 width: 20%;
@@ -76,6 +108,18 @@
                 left: 50%;
                 margin-top: -10%;
                 margin-left: -10%;
+            }
+
+            #errContents {
+                color: indianred;
+            }
+
+            td {
+                padding:0 15px 0 15px;
+            }
+            paper-input {
+                display: block;
+                width: 200px;
             }
 
         </style>
@@ -91,11 +135,38 @@
             static get is() { 
                 return 'my-login'; 
             }
-            openLogInDia() {
-                this.$.logInDia.open();
+            logIn() {
+                //Do stuff for logging in.
+                if(this.$.logInEmail.value != null && this.$.logInPassword.value != null) {
+                    this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
+                        this.$.logInPassword.value.trim())
+                        .then(function(response) {
+                            this.$.logIn.visibility = "hidden";
+                            this.$.logIn.disabled = true;
+                            this.$.signUp.visibility = "hidden";
+                            this.$.signUp.disabled = true;
+                            location.href = "/user-stats";
+                            //console.log("Hello " + response.user.displayName);
+                        }.bind(this))
+                        .catch(function(error) {
+                            //Handle errors.
+                            this.$.errContents.innerHTML = error.message;
+                            this.$.errorDia.open();
+                            console.log(error);
+                        }.bind(this));
+                }
             }
-            openSignUpDia() {
-                this.$.signUpDia.open();
+            signUp() {
+                //Do stuff for signing up.
+                if(this.$.signUpEmail.value != null && this.$.signUpPassword.value != null &&
+                    this.$.passwordConfirm != null) {
+                    //console.log("USERNAME: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
+                    if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
+                        console.log("Passwords match!");
+                        this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
+                            this.$.signUpPassword.value.trim());
+                    }
+                }
             }
             diaClosed() { // dialog close handler
                 if(this.$.logInDia.closingReason.confirmed){
@@ -110,6 +181,9 @@
                                 this.$.signUp.disabled = true;
                                 location.href = "/user-stats";
                                 //console.log("Hello " + response.user.displayName);
+                            }.bind(this))
+                            .catch(function(error) {
+                                //Handle errors.
                             }.bind(this));
                     }
                 } else if(this.$.signUpDia.closingReason.confirmed) {
