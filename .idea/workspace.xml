@@ -2,23 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5a5d2922-3075-432b-8176-2a4e617df3f3" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower.json" afterPath="$PROJECT_DIR$/bower.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.bower.json" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.bower.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.github/ISSUE_TEMPLATE.md" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.github/ISSUE_TEMPLATE.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.gitignore" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.travis.yml" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/.travis.yml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/CONTRIBUTING.md" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/CONTRIBUTING.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/README.md" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/bower.json" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/bower.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/demo/index.html" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/demo/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/demo/svg-sample-icons.html" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/demo/svg-sample-icons.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/index.html" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/iron-iconset-svg.html" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/iron-iconset-svg.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/test/index.html" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/test/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/bower_components/iron-iconset-svg/test/iron-iconset-svg.html" afterPath="$PROJECT_DIR$/bower_components/iron-iconset-svg/test/iron-iconset-svg.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/the-sacred-lion-app/my-login.html" afterPath="$PROJECT_DIR$/src/the-sacred-lion-app/my-login.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/the-sacred-lion-app/the-sacred-lion-app.html" afterPath="$PROJECT_DIR$/src/the-sacred-lion-app/the-sacred-lion-app.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -32,21 +17,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="the-sacred-lion-app.html" pinned="false" current-in-tab="false">
+      <file leaf-file-name="the-sacred-lion-app.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/the-sacred-lion-app.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="85" column="68" lean-forward="false" selection-start-line="85" selection-start-column="68" selection-end-line="85" selection-end-column="68" />
+            <state relative-caret-position="992">
+              <caret line="119" column="17" lean-forward="true" selection-start-line="119" selection-start-column="17" selection-end-line="119" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="my-login.html" pinned="false" current-in-tab="true">
+      <file leaf-file-name="my-login.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-login.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="620">
-              <caret line="113" column="33" lean-forward="false" selection-start-line="113" selection-start-column="33" selection-end-line="113" selection-end-column="33" />
+            <state relative-caret-position="160">
+              <caret line="123" column="21" lean-forward="true" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -152,12 +137,12 @@
       <workItem from="1510790224906" duration="432000" />
       <workItem from="1510867624743" duration="5682000" />
       <workItem from="1510887071303" duration="1096000" />
-      <workItem from="1511021529210" duration="2600000" />
+      <workItem from="1511021529210" duration="10505000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13544000" />
+    <option name="totallyTimeSpent" value="21449000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
@@ -304,15 +289,15 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/the-sacred-lion-app.html">
+    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-private-profile.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="85" column="68" lean-forward="false" selection-start-line="85" selection-start-column="68" selection-end-line="85" selection-end-column="68" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-private-profile.html">
+    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-events.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -322,8 +307,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-login.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="620">
-          <caret line="113" column="33" lean-forward="false" selection-start-line="113" selection-start-column="33" selection-end-line="113" selection-end-column="33" />
+        <state relative-caret-position="160">
+          <caret line="123" column="21" lean-forward="true" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/the-sacred-lion-app.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="992">
+          <caret line="119" column="17" lean-forward="true" selection-start-line="119" selection-start-column="17" selection-end-line="119" selection-end-column="17" />
           <folding />
         </state>
       </provider>

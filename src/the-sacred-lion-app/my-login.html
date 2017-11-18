@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
@@ -60,41 +62,16 @@
         </div>
         <div>
             <paper-dialog id="errorDia">
-                <iron-label><div id="errContents"></div></iron-label>
+                <iron-label>
+                    <div class="layout horizontal ">
+                        <div id="errContents"></div>
+                        <iron-icon class="card-actions" icon="close" on-click="closeErrDia"></iron-icon>
+                    </div>
+                </iron-label>
             </paper-dialog>
         </div>
-        <!--
-        <div class="card">
-            <div id="logInButtons">
-                <paper-button id="logIn" on-click="openLogInDia">Log In</paper-button>
-                <paper-button id="signUp" on-click="openSignUpDia">Sign Up</paper-button>
-            </div>
-        </div>
 
-            <div>
-                <paper-dialog id="logInDia" on-iron-overlay-closed="diaClosed">
-                    <div class="inputs">
-                        <paper-input id="logInEmail" label="Email"></paper-input>
-                        <paper-input id="logInPassword" type="password" label="Password"></paper-input>
-                    </div>
-                    <div class="buttons">
-                        <paper-button dialog-confirm>Login</paper-button>
-                        <paper-button dialog-dismiss>Cancel</paper-button>
-                    </div>
-                </paper-dialog>
-                <paper-dialog id="signUpDia" on-iron-overlay-closed="diaClosed">
-                    <div class="inputs">
-                        <paper-input id="signUpEmail" label="Email"></paper-input>
-                        <paper-input id="signUpPassword" type="password" label="Password"></paper-input>
-                        <paper-input id="passwordConfirm" type="password" label="Password Confirmation"></paper-input>
-                    </div>
-                    <div class="buttons">
-                        <paper-button dialog-confirm>Sign Up</paper-button>
-                        <paper-button dialog-dismiss>Cancel</paper-button>
-                    </div>
-                </paper-dialog>
-            </div> -->
-
+        <style include="iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse"></style>
         <style>
             :host {
                 display: block;
@@ -117,9 +94,18 @@
             td {
                 padding:0 15px 0 15px;
             }
+
             paper-input {
                 display: block;
                 width: 200px;
+            }
+
+            paper-dialog {
+                padding: 10px;
+            }
+
+            iron-icon {
+                cursor: pointer;
             }
 
         </style>
@@ -141,18 +127,21 @@
                     this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
-                            this.$.logIn.visibility = "hidden";
-                            this.$.logIn.disabled = true;
-                            this.$.signUp.visibility = "hidden";
-                            this.$.signUp.disabled = true;
+                            console.log("Hello " + response.email);
                             location.href = "/user-stats";
-                            //console.log("Hello " + response.user.displayName);
                         }.bind(this))
                         .catch(function(error) {
-                            //Handle errors.
-                            this.$.errContents.innerHTML = error.message;
+                            //Handle errors.  I tried to put this in a function, however kept saying it wasn't defined.
+                            if(error.code == "auth/user-not-found") {
+                                this.$.errContents.innerHTML = "No account with that email.";
+                            } else if(error.code == "auth/invalid-email") {
+                                this.$.errContents.innerHTML = "Please enter a valid email address.";
+                            } else if(error.code == "auth/wrong-password") {
+                                this.$.errContents.innerHTML = "Invalid password."
+                            } else {
+                                this.$.errContents.innerHTML = error.message; //All other errors.
+                            }
                             this.$.errorDia.open();
-                            console.log(error);
                         }.bind(this));
                 }
             }
@@ -164,43 +153,30 @@
                     if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
                         console.log("Passwords match!");
                         this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
-                            this.$.signUpPassword.value.trim());
-                    }
-                }
-            }
-            diaClosed() { // dialog close handler
-                if(this.$.logInDia.closingReason.confirmed){
-                    //Do stuff for logging in.
-                    if(this.$.logInEmail.value != null && this.$.logInPassword.value != null) {
-                        this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
-                            this.$.logInPassword.value.trim())
+                            this.$.signUpPassword.value.trim())
                             .then(function(response) {
-                                this.$.logIn.visibility = "hidden";
-                                this.$.logIn.disabled = true;
-                                this.$.signUp.visibility = "hidden";
-                                this.$.signUp.disabled = true;
+                                console.log("Hello " + response.email);
                                 location.href = "/user-stats";
-                                //console.log("Hello " + response.user.displayName);
                             }.bind(this))
                             .catch(function(error) {
-                                //Handle errors.
+                                if(error.code == "auth/user-not-found") {
+                                    this.$.errContents.innerHTML = "No account with that email and password combination.";
+                                } else if(error.code == "auth/invalid-email") {
+                                    this.$.errContents.innerHTML = "Please enter a valid email address.";
+                                } else {
+                                    this.$.errContents.innerHTML = error.message; //All other errors.
+                                }
+                                this.$.errorDia.open();
                             }.bind(this));
+                    } else {
+                        this.$.errContents.innerHTML = "Passwords do not match.";
+                        this.$.errorDia.open();
                     }
-                } else if(this.$.signUpDia.closingReason.confirmed) {
-                    //Do stuff for signing up.
-                    if(this.$.signUpEmail.value != null && this.$.signUpPassword.value != null &&
-                        this.$.passwordConfirm != null) {
-                        //console.log("USERNAME: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
-                        if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
-                            console.log("Passwords match!");
-                            this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
-                                this.$.signUpPassword.value.trim());
-                        }
-                    }
-
                 }
             }
-
+            closeErrDia() {
+                this.$.errorDia.close();
+            }
             static get properties() {
                 return {
                     user: {
