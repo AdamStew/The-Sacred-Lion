@@ -1,3 +1,5 @@
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
@@ -59,12 +61,12 @@
                 color: black;
                 font-weight: bold;
             }
-
-            #userLinks {
-                visibility: hidden;
-            }
         </style>
-    
+
+        <firebase-document path="/users/[[user.uid]]/text" data="{{data}}"></firebase-document>
+
+
+
         <app-location
             route="{{route}}"
             url-space-regex="^[[rootPath]]">
@@ -82,8 +84,12 @@
             <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
                 <app-toolbar>Menu</app-toolbar>
                 <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-                    <a name="login" href="[[rootPath]]login">Login</a>
-                    <div id="userLinks">
+                    <div hidden$="[[user]]"> <!-- Login is only displayed when you're not logged in. -->
+                        <a name="login" href="[[rootPath]]login">Login</a>
+                    </div>
+
+                    <div id="userLinks" hidden$="[[!user]]"> <!--These links are hidden when you aren't logged in. -->
+                        <a name="sign-out" href="[[rootPath]]login" on-click="_signOut">Sign Out</a>
                         <a name="events" href="[[rootPath]]events">Events</a>
                         <a name="invites" href="[[rootPath]]invites">Invites</a>
                         <a name="private-profile" href="[[rootPath]]private-profile">Private Profile</a>
@@ -105,7 +111,7 @@
                 </app-header>
 
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
-                    <my-login name="login"></my-login>
+                    <my-login id="auth" name="login" user="{{user}}"></my-login>
                     <my-events name="events"></my-events>
                     <my-invites name="invites"></my-invites>
                     <my-private-profile name="private-profile"></my-private-profile>
@@ -133,7 +139,8 @@
                     subroute: String,
                     // This shouldn't be neccessary, but the Analyzer isn't picking up
                     // Polymer.Element#rootPath
-                    rootPath: String
+                    rootPath: String,
+                    currentUser: Object
                 };
             }
 
@@ -162,6 +169,9 @@
 
             _showPage404() {
                 this.page = 'view404';
+            }
+            _signOut() {
+                this.$.auth.signOut();
             }
         }
 

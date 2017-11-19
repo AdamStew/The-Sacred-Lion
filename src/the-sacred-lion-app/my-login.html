@@ -35,7 +35,10 @@
 
         <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
 
-        <div id="allTableData">
+        <div id="welcomeUser" hidden$="[[!user]]">
+            <label>Welcome!</label>
+        </div>
+        <div id="allTableData" hidden$="[[user]]">
             <table id="logInMaterial">
                 <tr>
                     <th>Log in</th>
@@ -55,8 +58,8 @@
                     </paper-input></td>
                 </tr>
                 <tr>
-                    <td align="center"><paper-button id="logIn" on-click="logIn">Log In</paper-button></td>
-                    <td align="center"><paper-button id="signUp" on-click="signUp">Sign Up</paper-button></td>
+                    <td align="center"><paper-button id="logIn" on-click="_logIn">Log In</paper-button></td>
+                    <td align="center"><paper-button id="signUp" on-click="_signUp">Sign Up</paper-button></td>
                 </tr>
             </table>
         </div>
@@ -65,7 +68,7 @@
                 <iron-label>
                     <div class="layout horizontal ">
                         <div id="errContents"></div>
-                        <iron-icon class="card-actions" icon="close" on-click="closeErrDia"></iron-icon>
+                        <iron-icon class="card-actions" icon="close" on-click="_closeErrDia"></iron-icon>
                     </div>
                 </iron-label>
             </paper-dialog>
@@ -85,6 +88,17 @@
                 left: 50%;
                 margin-top: -10%;
                 margin-left: -10%;
+            }
+
+            #welcomeUser {
+                position: fixed;
+                width: 20%;
+                z-index: 2;
+                top: 50%;
+                left: 50%;
+                margin-top: -10%;
+                margin-left: -10%;
+                font-size: 180%;
             }
 
             #errContents {
@@ -121,14 +135,14 @@
             static get is() { 
                 return 'my-login'; 
             }
-            logIn() {
+            _logIn() {
                 //Do stuff for logging in.
                 if(this.$.logInEmail.value != null && this.$.logInPassword.value != null) {
                     this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
                             console.log("Hello " + response.email);
-                            location.href = "/events";
+                            //location.href = "/events";
                         }.bind(this))
                         .catch(function(error) {
                             //Handle errors.  I tried to put this in a function, however kept saying it wasn't defined.
@@ -145,7 +159,7 @@
                         }.bind(this));
                 }
             }
-            signUp() {
+            _signUp() {
                 //Do stuff for signing up.
                 if(this.$.signUpEmail.value != null && this.$.signUpPassword.value != null &&
                     this.$.passwordConfirm != null) {
@@ -156,7 +170,7 @@
                             this.$.signUpPassword.value.trim())
                             .then(function(response) {
                                 console.log("Hello " + response.email);
-                                location.href = "/events";
+                                //location.href = "/events";
                             }.bind(this))
                             .catch(function(error) {
                                 if(error.code == "auth/user-not-found") {
@@ -174,15 +188,18 @@
                     }
                 }
             }
-            closeErrDia() {
+            _closeErrDia() {
                 this.$.errorDia.close();
+            }
+            signOut() {
+                this.$.auth.signOut();
             }
             static get properties() {
                 return {
                     user: {
                         type: Object,
                         notify: true,
-                        value: false
+                        value: null
                     }
                 };
             }
