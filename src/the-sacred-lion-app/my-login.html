@@ -128,7 +128,7 @@
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
                             console.log("Hello " + response.email);
-                            location.href = "/user-stats";
+                            location.href = "/events";
                         }.bind(this))
                         .catch(function(error) {
                             //Handle errors.  I tried to put this in a function, however kept saying it wasn't defined.
@@ -156,7 +156,7 @@
                             this.$.signUpPassword.value.trim())
                             .then(function(response) {
                                 console.log("Hello " + response.email);
-                                location.href = "/user-stats";
+                                location.href = "/events";
                             }.bind(this))
                             .catch(function(error) {
                                 if(error.code == "auth/user-not-found") {
