@@ -1,26 +1,111 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-request.html">
+<link rel="import" href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/good-map/good-map.html">
+<link rel="import" href="../../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../../bower_components/datetime-picker/datetime-shared-style.html">
+<link rel="import" href="../../bower_components/datetime-picker/datetime-input.html">
+<link rel="import" href="../../bower_components/datetime-picker/date-picker.html">
+<link rel="import" href="../../bower_components/datetime-picker/datetime-picker.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 
 <dom-module id="my-events">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
 
-        padding: 10px;
-      }
-    </style>
+        <iron-ajax
+                auto
+                url="https://www.boardgamegeek.com/xmlapi/search?search"
+                params='{"part":"snippet", "q":"polymer", "key": "YOUTUBE_API_KEY", "type": "video"}' <!--change-->
+                handle-as="xml"
+                on-response="handleResponse"
+                debounce-duration="300"></iron-ajax>
 
-    <div class="card">
-      <h1>Events</h1>
-    </div>
-  </template>
+        <div class="card">
+            <div class="layout horizontal">
+                <h1 class="flex">Events</h1>
+                <iron-icon class="card-actions" icon="add" on-click="openDia"></iron-icon>
+            </div>
+        </div>
 
-  <script>
-    class MyEvents extends Polymer.Element {
-      static get is() { return 'my-events'; }
-    }
+        <div>
+            <paper-dialog id="newEvent" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeDia">
+                <div class="inputs">
+                    <paper-input id="gameName" label="Game Name"></paper-input>
+                    <paper-input id="min" label="Minimum Players"></paper-input> <!--Change later to correlate with game.-->
+                    <paper-input id="max" label="Maximum Players"></paper-input> <!--Change later to correlate with game.-->
+                    <vaadin-date-picker label="Date of Event"></vaadin-date-picker><br>
+                    <time-element time="{{time}}"></time-element>
+                </div>
+                <div class="buttons">
+                    <paper-button dialog-confirm>Add</paper-button>
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                </div>
+            </paper-dialog>
+        </div>
 
-    window.customElements.define(MyEvents.is, MyEvents);
-  </script>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+
+            iron-icon {
+                cursor: pointer;
+            }
+
+            paper-dialog {
+                padding: 120px;
+            }
+
+            time-element {
+                padding: 8px;
+            }
+
+        </style>
+    </template>
+
+    <script>
+        class MyEvents extends Polymer.Element {
+            static get is() {
+                return 'my-events';
+            }
+
+            openDia() {
+                this.$.newEvent.open();
+            }
+
+            closeDia() { // dialog close handler
+                if(this.$.newEvent.closingReason.confirmed) {
+                    var dbRef = this.$.myFireApp.app.database();
+                    //Do firebase stuff.
+                }
+            }
+
+            patchOverlay(e) {
+                if(e.target.withBackdrop) {
+                    e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+                }
+            }
+
+        }
+
+        window.customElements.define(MyEvents.is, MyEvents);
+    </script>
 </dom-module>

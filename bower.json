@@ -24,7 +24,8 @@
     "polymerfire": "firebase/polymerfire#^2.2.1",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
     "iron-label": "PolymerElements/iron-label#^2.0.0",
-    "iron-icons": "PolymerElements/iron-icons#^2.0.1"
+    "iron-icons": "PolymerElements/iron-icons#^2.0.1",
+    "datetime-picker": "fooloomanzoo/datetime-picker#^2.5.2"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
