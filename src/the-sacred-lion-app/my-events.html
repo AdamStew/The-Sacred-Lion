@@ -29,12 +29,12 @@
     <template>
 
         <iron-ajax
-                auto
-                url="https://www.boardgamegeek.com/xmlapi/search?search"
-                params='{"part":"snippet", "q":"polymer", "key": "YOUTUBE_API_KEY", "type": "video"}' <!--change-->
-                handle-as="xml"
-                on-response="handleResponse"
-                debounce-duration="300"></iron-ajax>
+                id="boardGameAjax"
+                url="https://boardgamegeek.com/xmlapi2/search"
+                params='{{ajaxParam}}'
+                handle-as="document"
+                on-response="_handleResponse"
+                last-response="{{data}}"></iron-ajax>
 
         <div class="card">
             <div class="layout horizontal">
@@ -43,17 +43,26 @@
             </div>
         </div>
 
+
         <div>
-            <paper-dialog id="newEvent" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeDia">
+            <paper-dialog id="pickGame" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeSearch">
                 <div class="inputs">
-                    <paper-input id="gameName" label="Game Name"></paper-input>
-                    <paper-input id="min" label="Minimum Players"></paper-input> <!--Change later to correlate with game.-->
-                    <paper-input id="max" label="Maximum Players"></paper-input> <!--Change later to correlate with game.-->
+                    <paper-input id="gameName" label="Game Name" value="{{boardName}}"></paper-input>
+                    <paper-button on-click="searchGame">Search</paper-button>
+                </div>
+                <div class="buttons">
+                    <paper-button dialog-confirm>Confirm</paper-button>
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                </div>
+            </paper-dialog>
+
+            <paper-dialog id="otherDetails" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeOtherDetails">
+                <div class="inputs">
                     <vaadin-date-picker label="Date of Event"></vaadin-date-picker><br>
                     <time-element time="{{time}}"></time-element>
                 </div>
                 <div class="buttons">
-                    <paper-button dialog-confirm>Add</paper-button>
+                    <paper-button dialog-confirm>Add Event</paper-button>
                     <paper-button dialog-dismiss>Cancel</paper-button>
                 </div>
             </paper-dialog>
@@ -87,14 +96,41 @@
                 return 'my-events';
             }
 
-            openDia() {
-                this.$.newEvent.open();
+            static get properties() {
+                return {
+                    ajaxParam: {
+                        type: String,
+                        computed: 'processParam(boardName)'
+                    }
+                };
             }
 
-            closeDia() { // dialog close handler
-                if(this.$.newEvent.closingReason.confirmed) {
-                    var dbRef = this.$.myFireApp.app.database();
-                    //Do firebase stuff.
+            processParam(boardName) {
+                return {"query":boardName, "type":"boardgame"};
+            }
+
+            _handleResponse(event) {
+                var response = event.detail.response;
+                console.log(response);
+            }
+
+            searchGame() {
+                this.$.boardGameAjax.generateRequest();
+            }
+
+            openDia() {
+                this.$.pickGame.open();
+            }
+
+            closeSearch() { // dialog close handler
+                if(this.$.pickGame.closingReason.confirmed) {
+                    this.$.otherDetails.open();
+                }
+            }
+
+            closeOtherDetails() {
+                if(this.$.otherDetails.closingReason.confirmed) {
+                    //Store fb stuff.
                 }
             }
 
@@ -103,7 +139,6 @@
                     e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
                 }
             }
-
         }
 
         window.customElements.define(MyEvents.is, MyEvents);
