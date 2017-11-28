@@ -40,9 +40,9 @@
             <div class="layout horizontal">
                 <h1 class="flex">Events</h1>
                 <iron-icon class="card-actions" icon="add" on-click="openDia"></iron-icon>
+                <div>[[searchList]]</div>
             </div>
         </div>
-
 
         <div>
             <paper-dialog id="pickGame" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeSearch">
@@ -50,6 +50,11 @@
                     <paper-input id="gameName" label="Game Name" value="{{boardName}}"></paper-input>
                     <paper-button on-click="searchGame">Search</paper-button>
                 </div>
+
+                <iron-list>
+                    <div id="boardgameNames"></div>
+                </iron-list>
+
                 <div class="buttons">
                     <paper-button dialog-confirm>Confirm</paper-button>
                     <paper-button dialog-dismiss>Cancel</paper-button>
@@ -80,11 +85,19 @@
             }
 
             paper-dialog {
-                padding: 120px;
+                padding: 180px;
             }
 
             time-element {
                 padding: 8px;
+            }
+
+            iron-list {
+                height: 30vh;
+            }
+
+            paper-card {
+                width: 100%;
             }
 
         </style>
@@ -112,6 +125,19 @@
             _handleResponse(event) {
                 var response = event.detail.response;
                 console.log(response);
+
+                this.$.boardgameNames.innerHTML = ""; //Clear div.
+
+                //Get all of the board game names from the search.
+                for(var i=0; i < response.getElementsByTagName("items")[0].getElementsByTagName("item").length; i++) {
+                    //Game ID. console.log(response.getElementsByTagName("items")[0].getElementsByTagName("item")[i].getAttribute("id"));
+
+                    //Create a card with the board game name displayed.
+                    var card = document.createElement("paper-card");
+                    card.innerHTML = response.getElementsByTagName("items")[0].getElementsByTagName("item")[i]
+                        .getElementsByTagName("name")[0].getAttribute("value");
+                    this.$.boardgameNames.appendChild(card);
+                }
             }
 
             searchGame() {
