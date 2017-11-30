@@ -27,8 +27,6 @@
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 
-<!-- Google API Key: AIzaSyBlgE4O9hgijK1uAOARzCsP7zg3JICHybo -->
-
 <dom-module id="my-events">
     <template>
 
@@ -40,7 +38,9 @@
                       messaging-sender-id="74198786972">
         </firebase-app>
 
-        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
+        <firebase-auth id="auth" user="{{user}}"></firebase-auth>
+
+        <firebase-query path="/users/[[user.uid]]/events" data="{{qryData}}"></firebase-query>
 
         <iron-ajax
                 id="boardGameSearchAjax"
@@ -64,9 +64,21 @@
 
         <div class="card">
             <div class="layout horizontal">
-                <h1 class="flex">Events [[user.email]]</h1>
+                <h1 class="flex">Events</h1>
                 <iron-icon class="card-actions" icon="add" on-click="openDia"></iron-icon>
             </div>
+            <iron-list id="allEvents" items="[[qryData]]" as="event">
+                <template>
+                    <div id="eventList">
+                        <paper-card id="events" class="layout vertical" elevation="2">
+                            <div>[[event.gameName]]</div>
+                            <div>[[event.time.date]]</div>
+                            <div></div>
+                            <div></div>
+                        </paper-card>
+                    </div>
+                </template>
+            </iron-list>
         </div>
 
         <div>
@@ -143,6 +155,24 @@
 
             paper-button {
                 width: 100%;
+            }
+
+            #allEvents {
+                height: 50vh;
+                width: 40vw;
+            }
+            #events {
+                width: 100%;
+                background-color: #deffff;
+                border-radius: 8px;
+                padding: 6px;
+            }
+            .layout {
+                display: flex;
+                align-items: flex-start;
+            }
+            #eventList {
+                padding: 10px;
             }
 
         </style>
