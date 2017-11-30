@@ -4,7 +4,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="15">
+          <list size="20">
             <item index="0" class="java.lang.String" itemvalue="url" />
             <item index="1" class="java.lang.String" itemvalue="params" />
             <item index="2" class="java.lang.String" itemvalue="handle-as" />
@@ -20,6 +20,27 @@
             <item index="12" class="java.lang.String" itemvalue="dialog-dismiss" />
             <item index="13" class="java.lang.String" itemvalue="time" />
             <item index="14" class="java.lang.String" itemvalue="include" />
+            <item index="15" class="java.lang.String" itemvalue="item-icon" />
+            <item index="16" class="java.lang.String" itemvalue="items" />
+            <item index="17" class="java.lang.String" itemvalue="as" />
+            <item index="18" class="java.lang.String" itemvalue="on-tap" />
+            <item index="19" class="java.lang.String" itemvalue="data-item$" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="7">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="google-map-search" />
           </list>
         </value>
       </option>
