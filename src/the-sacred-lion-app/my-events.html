@@ -29,36 +29,38 @@
     <template>
 
         <iron-ajax
-                id="boardGameAjax"
+                id="boardGameSearchAjax"
                 url="https://boardgamegeek.com/xmlapi2/search"
-                params='{{ajaxParam}}'
+                params='{{searchParam}}'
                 handle-as="document"
-                on-response="_handleResponse"
-                last-response="{{data}}"></iron-ajax>
+                on-response="_handleSearchResponse"></iron-ajax>
+
+        <iron-ajax
+                id="boardGameIdAjax"
+                url="https://bgg-json.azurewebsites.net/thing/{{idParam}}"
+                handle-as="json"
+                on-response="_handleJsonResponse"></iron-ajax>
 
         <div class="card">
             <div class="layout horizontal">
                 <h1 class="flex">Events</h1>
                 <iron-icon class="card-actions" icon="add" on-click="openDia"></iron-icon>
-                <div>[[searchList]]</div>
             </div>
         </div>
 
         <div>
-            <paper-dialog id="pickGame" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeSearch">
+            <paper-dialog id="pickGame" modal on-iron-overlay-opened="patchOverlay">
                 <div class="inputs">
                     <paper-input id="gameName" label="Game Name" value="{{boardName}}"></paper-input>
                     <paper-button on-click="searchGame">Search</paper-button>
                 </div>
-
-                <iron-list>
-                    <div id="boardgameNames"></div>
+                <iron-list items="[[results]]" as="item">
+                    <template>
+                        <div>
+                            <paper-button on-tap="_selectGameId" data-item$="[[item.id]]">[[item.name]]</paper-button>
+                        </div>
+                    </template>
                 </iron-list>
-
-                <div class="buttons">
-                    <paper-button dialog-confirm>Confirm</paper-button>
-                    <paper-button dialog-dismiss>Cancel</paper-button>
-                </div>
             </paper-dialog>
 
             <paper-dialog id="otherDetails" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeOtherDetails">
@@ -93,10 +95,10 @@
             }
 
             iron-list {
-                height: 30vh;
+                height: 40vh;
             }
 
-            paper-card {
+            paper-button {
                 width: 100%;
             }
 
@@ -104,6 +106,7 @@
     </template>
 
     <script>
+
         class MyEvents extends Polymer.Element {
             static get is() {
                 return 'my-events';
@@ -111,47 +114,59 @@
 
             static get properties() {
                 return {
-                    ajaxParam: {
+                    searchParam: {
                         type: String,
-                        computed: 'processParam(boardName)'
+                        computed: '_processParam(boardName)'
+                    },
+
+                    idParam: {
+                        type: String
+                    },
+
+                    results: {
+                        type: Array,
+                        value: []
                     }
                 };
             }
 
-            processParam(boardName) {
+            _processParam(boardName) {
                 return {"query":boardName, "type":"boardgame"};
             }
 
-            _handleResponse(event) {
+            _selectGameId(event) {
+                this.set("idParam", event.target.dataset.item);
+                this.$.boardGameIdAjax.generateRequest();
+                this.$.pickGame.close();
+                this.$.otherDetails.open();
+            }
+
+            _handleSearchResponse(event) {
+                var response = event.detail.response;
+                var resultsLen = response.getElementsByTagName("items")[0].getElementsByTagName("item").length;
+                this.splice("results", 0, this.results.length); //Clear out old results.
+
+                //Fill array with names and IDs.
+                for(var i=0; i < resultsLen; i++) {
+                    var res = {name: response.getElementsByTagName("items")[0].getElementsByTagName("item")[i]
+                        .getElementsByTagName("name")[0].getAttribute("value"), id: response
+                        .getElementsByTagName("items")[0].getElementsByTagName("item")[i].getAttribute("id")};
+                    this.push("results", res);
+                }
+                console.log(this.results);
+            }
+
+            _handleJsonResponse(event) {
                 var response = event.detail.response;
                 console.log(response);
-
-                this.$.boardgameNames.innerHTML = ""; //Clear div.
-
-                //Get all of the board game names from the search.
-                for(var i=0; i < response.getElementsByTagName("items")[0].getElementsByTagName("item").length; i++) {
-                    //Game ID. console.log(response.getElementsByTagName("items")[0].getElementsByTagName("item")[i].getAttribute("id"));
-
-                    //Create a card with the board game name displayed.
-                    var card = document.createElement("paper-card");
-                    card.innerHTML = response.getElementsByTagName("items")[0].getElementsByTagName("item")[i]
-                        .getElementsByTagName("name")[0].getAttribute("value");
-                    this.$.boardgameNames.appendChild(card);
-                }
             }
 
             searchGame() {
-                this.$.boardGameAjax.generateRequest();
+                this.$.boardGameSearchAjax.generateRequest();
             }
 
             openDia() {
                 this.$.pickGame.open();
-            }
-
-            closeSearch() { // dialog close handler
-                if(this.$.pickGame.closingReason.confirmed) {
-                    this.$.otherDetails.open();
-                }
             }
 
             closeOtherDetails() {

@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5a5d2922-3075-432b-8176-2a4e617df3f3" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/Adam.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/the-sacred-lion-app/my-events.html" afterPath="$PROJECT_DIR$/src/the-sacred-lion-app/my-events.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -29,7 +31,7 @@
       <file leaf-file-name="my-login.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-login.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="812">
+            <state relative-caret-position="3920">
               <caret line="196" column="25" lean-forward="false" selection-start-line="196" selection-start-column="25" selection-end-line="196" selection-end-column="25" />
               <folding />
             </state>
@@ -39,8 +41,8 @@
       <file leaf-file-name="my-events.html" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-events.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="552">
-              <caret line="56" column="0" lean-forward="true" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+            <state relative-caret-position="480">
+              <caret line="90" column="13" lean-forward="true" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -54,6 +56,8 @@
       <find>closeErr</find>
       <find>logIn</find>
       <find>ajaxParam</find>
+      <find>selectGame</find>
+      <find>boardGameAjax</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -160,12 +164,13 @@
       <workItem from="1511021529210" duration="12977000" />
       <workItem from="1511064197093" duration="6115000" />
       <workItem from="1511745311887" duration="6123000" />
-      <workItem from="1511819930568" duration="25224000" />
+      <workItem from="1511819930568" duration="42004000" />
+      <workItem from="1511975176239" duration="5237000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61383000" />
+    <option name="totallyTimeSpent" value="83400000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1938" height="1050" extended-state="6" />
@@ -200,6 +205,30 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/the-sacred-lion-app.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1800">
+          <caret line="90" column="40" lean-forward="false" selection-start-line="90" selection-start-column="40" selection-end-line="90" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-login.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3920">
+          <caret line="196" column="25" lean-forward="false" selection-start-line="196" selection-start-column="25" selection-end-line="196" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-events.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1200">
+          <caret line="60" column="38" lean-forward="false" selection-start-line="60" selection-start-column="34" selection-end-line="60" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/the-sacred-lion-app.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1800">
@@ -365,7 +394,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-login.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="812">
+        <state relative-caret-position="3920">
           <caret line="196" column="25" lean-forward="false" selection-start-line="196" selection-start-column="25" selection-end-line="196" selection-end-column="25" />
           <folding />
         </state>
@@ -373,8 +402,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-events.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="552">
-          <caret line="56" column="0" lean-forward="true" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+        <state relative-caret-position="480">
+          <caret line="90" column="13" lean-forward="true" selection-start-line="90" selection-start-column="13" selection-end-line="90" selection-end-column="13" />
           <folding />
         </state>
       </provider>
