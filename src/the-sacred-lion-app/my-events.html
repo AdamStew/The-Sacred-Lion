@@ -64,6 +64,7 @@
                 <div class="inputs">
                     <paper-input id="gameName" label="Game Name" value="{{boardName}}"></paper-input>
                     <paper-button on-click="searchGame">Search</paper-button>
+                    <paper-button dialog-dismiss>Cancel</paper-button>
                 </div>
                 <iron-list items="[[bgResults]]" as="item">
                     <template>
