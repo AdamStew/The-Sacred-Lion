@@ -136,16 +136,7 @@
                     this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
-                            var dbRef = this.$.myFireApp.app.database();
-                            dbRef.ref("users/" + response.uid)
-                                .once('value', (snap) => {
-                                    let result = snap.val();
-                                    if(result === null){
-                                        dbRef.ref('users/' + response.uid)
-                                            .child('private')
-                                            .set({ email: response.email })
-                                    }
-                                });
+                            signedInFirebase(response)
                             //location.href = "/events";
                         }.bind(this))
                         .catch(function(error) {
@@ -173,8 +164,7 @@
                         this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
                             this.$.signUpPassword.value.trim())
                             .then(function(response) {
-                                console.log("Hello " + response.email);
-                                //location.href = "/events";
+                                signedInFirebase(response)
                             }.bind(this))
                             .catch(function(error) {
                                 if(error.code == "auth/user-not-found") {
@@ -197,6 +187,18 @@
             }
             signOut() {
                 this.$.auth.signOut();
+            }
+            signedInFirebase(response){
+                var dbRef = this.$.myFireApp.app.database();
+                dbRef.ref("users/" + response.uid)
+                    .once('value', (snap) => {
+                        let result = snap.val();
+                        if(result === null){
+                            dbRef.ref('users/' + response.uid)
+                                .child('private')
+                                .set({ email: response.email })
+                        }
+                    });
             }
             static get properties() {
                 return {
