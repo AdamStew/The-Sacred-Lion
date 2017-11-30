@@ -136,7 +136,17 @@
                     this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
-                            console.log("Hello " + response.email);
+                            console.log(response);
+                            var dbRef = this.$.myFireApp.app.database();
+                            dbRef.ref("users/" + response.uid)
+                                .once('value', (snap) => {
+                                    let result = snap.val();
+                                    if(result === null){
+                                        dbRef.ref('users/' + response.uid)
+                                            .child('private')
+                                            .set({ email: response.email })
+                                    }
+                                })
                             //location.href = "/events";
                         }.bind(this))
                         .catch(function(error) {
