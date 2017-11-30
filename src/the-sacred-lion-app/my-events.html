@@ -32,6 +32,16 @@
 <dom-module id="my-events">
     <template>
 
+        <firebase-app id="myFireApp"
+                      api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
+                      auth-domain="the-sacred-lion.firebaseapp.com"
+                      database-url="https://the-sacred-lion.firebaseio.com"
+                      storage-bucket="the-sacred-lion.appspot.com"
+                      messaging-sender-id="74198786972">
+        </firebase-app>
+
+        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
+
         <iron-ajax
                 id="boardGameSearchAjax"
                 url="https://boardgamegeek.com/xmlapi2/search"
@@ -54,13 +64,14 @@
 
         <div class="card">
             <div class="layout horizontal">
-                <h1 class="flex">Events</h1>
+                <h1 class="flex">Events [[user.email]]</h1>
                 <iron-icon class="card-actions" icon="add" on-click="openDia"></iron-icon>
             </div>
         </div>
 
         <div>
             <paper-dialog id="pickGame" modal on-iron-overlay-opened="patchOverlay">
+                <h1>Select Game</h1>
                 <div class="inputs">
                     <paper-input id="gameName" label="Game Name" value="{{boardName}}"></paper-input>
                     <paper-button on-click="searchGame">Search</paper-button>
@@ -76,6 +87,7 @@
             </paper-dialog>
 
             <paper-dialog id="pickLocation" modal on-iron-overlay-opened="patchOverlay">
+                <h1>Select Location</h1>
                 <paper-input id="location" label="Location" value="{{location}}"></paper-input>
                 <paper-button on-click="searchLocation">Search</paper-button>
                 <iron-list items="[[locResults]]" as="item">
@@ -87,19 +99,15 @@
                 </iron-list>
             </paper-dialog>
 
-            <paper-dialog id="otherDetails" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="closeOtherDetails">
-                <div id="selectedDetails" class="layout vertical">
-                    <label id="selectedName"></label>
-                    <label id="selectedMin"></label>
-                    <label id="selectedMax"></label>
-                </div>
+            <paper-dialog id="pickTime" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_handleTime">
+                <h1>Select Date/Time</h1>
                 <div class="inputs">
-                    <vaadin-date-picker label="Date of Event"></vaadin-date-picker><br>
-                    <time-element time="{{time}}"></time-element>
+                    <vaadin-date-picker id="dateSelected" label="Date of Event"></vaadin-date-picker><br>
+                    <time-element id="timeSelected" time="{{time}}"></time-element>
 
                 </div>
                 <div class="buttons">
-                    <paper-button dialog-confirm>Add Event</paper-button>
+                    <paper-button dialog-confirm>Confirm Time</paper-button>
                     <paper-button dialog-dismiss>Cancel</paper-button>
                 </div>
             </paper-dialog>
@@ -154,18 +162,30 @@
                         computed: '_processParam(boardName)'
                     },
 
+                    bgResults: {
+                        type: Array,
+                        value: []
+                    },
+
                     idParam: {
+                        type: String
+                    },
+
+                    gameName: {
+                        type: String
+                    },
+
+                    gameMax: {
+                        type: String
+                    },
+
+                    gameMin: {
                         type: String
                     },
 
                     locationParam: {
                         type: String,
                         computed: '_processLocation(location)'
-                    },
-
-                    bgResults: {
-                        type: Array,
-                        value: []
                     },
 
                     locResults: {
@@ -178,6 +198,10 @@
                     },
 
                     latitude: {
+                        type: String
+                    },
+
+                    time: {
                         type: String
                     }
                 };
@@ -195,10 +219,11 @@
             }
 
             _selectLocation(event) {
-                this.set("longitude", event.target.dataset.item.long);
-                this.set("latitude", event.target.dataset.item.lat);
+                console.log(JSON.parse(event.target.dataset.item))
+                this.set("longitude", JSON.parse(event.target.dataset.item).long);
+                this.set("latitude", JSON.parse(event.target.dataset.item).lat);
                 this.$.pickLocation.close();
-                this.$.otherDetails.open();
+                this.$.pickTime.open();
             }
 
             _processLocation(location) {
@@ -230,9 +255,9 @@
                 var response = event.detail.response;
                 console.log(response);
 
-                this.$.selectedName.innerHTML = "Game: " + response.name;
-                this.$.selectedMin.innerHTML = "Minimum Players: " + response.minPlayers;
-                this.$.selectedMax.innerHTML = "Maximum Players: " + response.maxPlayers;
+                this.set("gameName", response.name);
+                this.set("gameMin", response.minPlayers);
+                this.set("gameMax", response.maxPlayers);
             }
 
             _handleLocationResponse(event) {
@@ -267,9 +292,13 @@
                 this.$.pickGame.open();
             }
 
-            closeOtherDetails() {
-                if(this.$.otherDetails.closingReason.confirmed) {
-                    //Store fb stuff.
+            _handleTime() {
+                if(this.$.pickTime.closingReason.confirmed) {
+                    var dbRef = this.$.myFireApp.app.database();
+                    dbRef.ref("users/" + this.user.uid + "/events").push().set({gameName: this.gameName, gameId: this.idParam,
+                        minPlayers: this.gameMin, maxPlayers: this.gameMax,
+                        location: {longitude: this.longitude, latitude: this.latitude},
+                        time: {date: this.$.dateSelected.value, timeOfDay: this.time}, players: "TBD"});
                 }
             }
 

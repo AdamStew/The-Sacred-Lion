@@ -112,7 +112,7 @@
 
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
                     <my-login id="auth" name="login" user="{{user}}"></my-login>
-                    <my-events name="events"></my-events>
+                    <my-events name="events" user="{{user}}"></my-events>
                     <my-invites name="invites"></my-invites>
                     <my-private-profile name="private-profile"></my-private-profile>
                     <my-public-profile name="public-profile"></my-public-profile>
