@@ -53,7 +53,7 @@
                 id="boardGameIdAjax"
                 url="https://bgg-json.azurewebsites.net/thing/{{idParam}}"
                 handle-as="json"
-                on-response="_handleJsonResponse"></iron-ajax>
+                on-response="_handleGameResponse"></iron-ajax>
 
         <iron-ajax
                 id="locationAjax"
@@ -65,7 +65,7 @@
         <div class="card">
             <div class="layout horizontal">
                 <h1 class="flex">Events</h1>
-                <iron-icon class="card-actions" icon="add" on-click="openDia"></iron-icon>
+                <iron-icon class="card-actions" icon="add" on-click="_createEvent"></iron-icon>
             </div>
             <iron-list id="allEvents" items="[[qryData]]" as="event">
                 <template>
@@ -88,12 +88,15 @@
         </div>
 
         <div>
-            <paper-dialog id="pickGame" modal on-iron-overlay-opened="patchOverlay">
+            <paper-dialog id="pickGame" modal on-iron-overlay-opened="_patchOverlay">
                 <h1>Select Game</h1>
-                <div class="inputs">
-                    <paper-input id="gameName" label="Game Name" value="{{boardName}}"></paper-input>
-                    <paper-button on-click="searchGame">Search</paper-button>
-                    <paper-button dialog-dismiss>Cancel</paper-button>
+                <div>
+                    <paper-input id="bgInput" label="Game Name" value="{{boardName}}"></paper-input>
+                    <div class="layout horizontal">
+                        <paper-button on-click="_cancelBgSearch">Cancel</paper-button>
+                        <paper-button on-click="_searchGame">Search</paper-button>
+                    </div>
+                    <div id="bgNoResults"></div>
                 </div>
                 <iron-list items="[[bgResults]]" as="item">
                     <template>
@@ -104,10 +107,16 @@
                 </iron-list>
             </paper-dialog>
 
-            <paper-dialog id="pickLocation" modal on-iron-overlay-opened="patchOverlay">
+            <paper-dialog id="pickLocation" modal on-iron-overlay-opened="_patchOverlay">
                 <h1>Select Location</h1>
-                <paper-input id="location" label="Location" value="{{location}}"></paper-input>
-                <paper-button on-click="searchLocation">Search</paper-button>
+                <div>
+                    <paper-input id="locationInput" label="Location" value="{{location}}"></paper-input>
+                    <div class="layout horizontal">
+                        <paper-button on-click="_backToGame">Back</paper-button>
+                        <paper-button on-click="_searchLocation">Search</paper-button>
+                    </div>
+                    <div id="locNoResults"></div>
+                </div>
                 <iron-list items="[[locResults]]" as="item">
                     <template>
                         <div>
@@ -117,16 +126,16 @@
                 </iron-list>
             </paper-dialog>
 
-            <paper-dialog id="pickTime" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_handleTime">
+            <paper-dialog id="pickTime" modal on-iron-overlay-opened="_patchOverlay" on-iron-overlay-closed="_handleTime">
                 <h1>Select Date/Time</h1>
                 <div class="inputs">
                     <vaadin-date-picker id="dateSelected" label="Date of Event" placeholder="Pick a date" required></vaadin-date-picker><br>
                     <time-element id="timeSelected" time="{{time}}"></time-element>
 
                 </div>
-                <div class="buttons">
+                <div class="layout horizontal">
+                    <paper-button on-click="_backToLocation">Cancel</paper-button>
                     <paper-button dialog-confirm>Confirm Time</paper-button>
-                    <paper-button dialog-dismiss>Cancel</paper-button>
                 </div>
             </paper-dialog>
         </div>
@@ -140,7 +149,10 @@
             google-map {
                 height: 200px;
                 width: 300px;
-                padding: 4px;
+                border: 2px solid black;
+                margin-bottom: 20px;
+                margin-left: 20px;
+                margin-right: 20px;
             }
             iron-icon {
                 cursor: pointer;
@@ -177,11 +189,23 @@
             #players {
                 padding: 8px;
             }
+            #bgNoResults {
+                color: red;
+            }
+            #locNoResults {
+                color: red;
+            }
 
         </style>
     </template>
 
     <script>
+
+        //Initially hide error prompts.
+        window.onload = function() {
+            document.getElementById("bgNoResults").hide();
+            document.getElementById("locNoResults").hide();
+        };
 
         class MyEvents extends Polymer.Element {
             static get is() {
@@ -240,10 +264,12 @@
                 };
             }
 
+            /* Whenever search input changes, change our parameters in the BoardGameGeek API. */
             _processParam(boardName) {
                 return {"query":boardName, "type":"boardgame"};
             }
 
+            /* WHenever a game is selected, sends request to receive more game information, while prompting next dia. */
             _selectGameId(event) {
                 this.set("idParam", event.target.dataset.item);
                 this.$.boardGameIdAjax.generateRequest();
@@ -251,18 +277,21 @@
                 this.$.pickLocation.open();
             }
 
+            /* Whenever a location is selected, pushes data into variables for later use and prompts next dialog. */
             _selectLocation(event) {
-                console.log(JSON.parse(event.target.dataset.item))
+                console.log(JSON.parse(event.target.dataset.item));
                 this.set("longitude", JSON.parse(event.target.dataset.item).long);
                 this.set("latitude", JSON.parse(event.target.dataset.item).lat);
                 this.$.pickLocation.close();
                 this.$.pickTime.open();
             }
 
+            /* Whenever search input changes, change our parameters in the Google Maps API. */
             _processLocation(location) {
                 return {"address":location};
             }
 
+            /* When we get a response on our game choices, pushes them into an array to be displayed. */
             _handleSearchResponse(event) {
                 var response = event.detail.response;
                 var resultsLen = response.getElementsByTagName("items")[0].getElementsByTagName("item").length;
@@ -279,12 +308,15 @@
                         this.push("bgResults", res);
                     }
                 } else {
-                    this.push("bgResults", "No Results");
+                    console.log("NO RESULTS!");
+                    this.$.bgNoResults.innerHTML = "No results.";
+                    this.$.bgNoResults.hidden = false;
                 }
                 console.log(this.bgResults);
             }
 
-            _handleJsonResponse(event) {
+            /* When we get a response on our game information, pushes data into variables for later use. */
+            _handleGameResponse(event) {
                 var response = event.detail.response;
                 console.log(response);
 
@@ -293,6 +325,7 @@
                 this.set("gameMax", response.maxPlayers);
             }
 
+            /* When we get a response on our location choices, pushes them into an array to be displayed. */
             _handleLocationResponse(event) {
                 var response = event.detail.response;
 
@@ -308,23 +341,54 @@
                         this.push("locResults", res);
                     }
                 } else {
-                    this.push("locResults", "No Results");
+                    console.log("NO RESULTS!");
+                    this.$.locNoResults.innerHTML = "No results.";
+                    this.$.locNoResults.hidden = false;
                 }
                 console.log(this.locResults);
             }
 
-            searchLocation() {
+            /* Searches for a location using Google Maps API. */
+            _searchLocation() {
+                this.$.locNoResults.hidden = true;
                 this.$.locationAjax.generateRequest();
             }
 
-            searchGame() {
+            /* Searches for a board game using boardgamegeek API. */
+            _searchGame() {
+                this.$.bgNoResults.hidden = true;
                 this.$.boardGameSearchAjax.generateRequest();
             }
 
-            openDia() {
+            /* Starts the event creation process. */
+            _createEvent() {
                 this.$.pickGame.open();
             }
 
+            /* Clears out dialog data, and cancels the event creation dialog. */
+            _cancelBgSearch() {
+                this.splice("bgResults", 0, this.bgResults.length); //Clear out old results.
+                this.$.bgInput.value = "";
+                this.$.bgNoResults.hidden = true;
+                this.$.pickGame.close();
+            }
+
+            /* Goes backwards a dialog, while clearing out all data on that dialog. */
+            _backToGame() {
+                this.splice("locResults", 0, this.locResults.length); //Clear out old results.
+                this.$.locationInput.value = "";
+                this.$.locNoResults.hidden = true;
+                this.$.pickLocation.close();
+                this.$.pickGame.open();
+            }
+
+            /* Goes backwards a dialog. */
+            _backToLocation() {
+                this.$.pickTime.close();
+                this.$.pickLocation.open();
+            }
+
+            /* Confirms time and day, and pushes all data to Firebase (since this is last dialog). */
             _handleTime() {
                 if(this.$.pickTime.closingReason.confirmed) {
                     //Change format from YYYY-MM-DD -> MM-DD-YYY.
@@ -359,7 +423,8 @@
                 }
             }
 
-            patchOverlay(e) {
+            //Fixes bug when dialog wouldn't appear in forground.
+            _patchOverlay(e) {
                 if(e.target.withBackdrop) {
                     e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
                 }
