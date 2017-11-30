@@ -136,7 +136,7 @@
                     this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
-                            signedInFirebase(response)
+                            this.signedInFirebase(response)
                             //location.href = "/events";
                         }.bind(this))
                         .catch(function(error) {
@@ -164,7 +164,7 @@
                         this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
                             this.$.signUpPassword.value.trim())
                             .then(function(response) {
-                                signedInFirebase(response)
+                                this.signedInFirebase(response)
                             }.bind(this))
                             .catch(function(error) {
                                 if(error.code == "auth/user-not-found") {
