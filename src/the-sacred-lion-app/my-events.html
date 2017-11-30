@@ -71,10 +71,16 @@
                 <template>
                     <div id="eventList">
                         <paper-card id="events" class="layout vertical" elevation="2">
-                            <div>[[event.gameName]]</div>
-                            <div>[[event.time.date]]</div>
-                            <div></div>
-                            <div></div>
+                            <h3>[[event.gameName]] - [[event.time.date]] @ [[event.time.timeOfDay]]</h3>
+                            <div class="layout horizontal-reverse">
+                                <div id="players" class="flex">Players: [[event.players]]</div>
+                                <google-map latitude="[[event.location.latitude]]" longitude="[[event.location.longitude]]"
+                                            api-key="AIzaSyBlgE4O9hgijK1uAOARzCsP7zg3JICHybo" zoom="15" disable-default-ui>
+                                    <google-map-marker latitude="[[event.location.latitude]]"
+                                                       longitude="[[event.location.longitude]]"
+                                                       title="Game Night!"></google-map-marker>
+                                </google-map>
+                            </div>
                         </paper-card>
                     </div>
                 </template>
@@ -114,7 +120,7 @@
             <paper-dialog id="pickTime" modal on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_handleTime">
                 <h1>Select Date/Time</h1>
                 <div class="inputs">
-                    <vaadin-date-picker id="dateSelected" label="Date of Event"></vaadin-date-picker><br>
+                    <vaadin-date-picker id="dateSelected" label="Date of Event" placeholder="Pick a date" required></vaadin-date-picker><br>
                     <time-element id="timeSelected" time="{{time}}"></time-element>
 
                 </div>
@@ -131,34 +137,28 @@
                 display: block;
                 padding: 10px;
             }
-
             google-map {
                 height: 200px;
                 width: 300px;
+                padding: 4px;
             }
-
             iron-icon {
                 cursor: pointer;
             }
-
             paper-dialog {
                 padding: 180px;
             }
-
             time-element {
                 padding: 8px;
             }
-
             iron-list {
                 height: 40vh;
             }
-
             paper-button {
                 width: 100%;
             }
-
             #allEvents {
-                height: 50vh;
+                height: 70vh;
                 width: 40vw;
             }
             #events {
@@ -173,6 +173,9 @@
             }
             #eventList {
                 padding: 10px;
+            }
+            #players {
+                padding: 8px;
             }
 
         </style>
@@ -324,11 +327,35 @@
 
             _handleTime() {
                 if(this.$.pickTime.closingReason.confirmed) {
+                    //Change format from YYYY-MM-DD -> MM-DD-YYY.
+                    var bgDate = this.$.dateSelected.value.split("-");
+                    var fmtDate = bgDate[1] + "-" + bgDate[2] + "-" + bgDate[0];
+
+                    //Change format of the time.
+                    var bgTime = this.time.split(":");
+                    var fmtTime;
+                    if(bgTime[0] >= 12) {
+                        if(bgTime[0] ==  12) {
+                            fmtTime = bgTime[0] + ":" + bgTime[1]; //Noon.
+                        } else {
+                            fmtTime = (bgTime[0] - 12) + ":" + bgTime[1] + " PM"; //1PM-11PM.
+                        }
+                        fmtTime += " PM";
+                    } else {
+                        if(bgTime[0] == 0) {
+                            fmtTime = 12 + ":" + bgTime[1]; //Midnight.
+                        } else {
+                            fmtTime = bgTime[0] + ":" + bgTime[1]; //1AM-11AM.
+                        }
+                        fmtTime += " AM";
+                    }
+
+                    //Add event to the user's event-list.
                     var dbRef = this.$.myFireApp.app.database();
                     dbRef.ref("users/" + this.user.uid + "/events").push().set({gameName: this.gameName, gameId: this.idParam,
                         minPlayers: this.gameMin, maxPlayers: this.gameMax,
                         location: {longitude: this.longitude, latitude: this.latitude},
-                        time: {date: this.$.dateSelected.value, timeOfDay: this.time}, players: "TBD"});
+                        time: {date: fmtDate, timeOfDay: fmtTime}, players: "TBD"});
                 }
             }
 
