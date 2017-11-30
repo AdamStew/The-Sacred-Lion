@@ -1,18 +1,80 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-user-list">
   <template>
-    <style include="shared-styles">
+      <firebase-app id="myFireApp"
+                    api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
+                    auth-domain="the-sacred-lion.firebaseapp.com"
+                    database-url="https://the-sacred-lion.firebaseio.com"
+                    storage-bucket="the-sacred-lion.appspot.com"
+                    messaging-sender-id="74198786972">
+      </firebase-app>
+
+      <firebase-query path="/users" data="{{qryData}}"></firebase-query>
+
+      <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
+
+    <style include="shared-styles iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse">
       :host {
         display: block;
 
         padding: 10px;
       }
+      iron-icon:hover{
+          cursor: pointer;
+      }
+      iron-list {
+          height: 50vh;
+          width: 40vw;
+      }
+      paper-card {
+          width: 100%;
+          background-color: #deffff;
+          border-radius: 8px;
+          padding: 6px;
+      }
+      .layout {
+          display: flex;
+          align-items: flex-start;
+      }
+      #userList {
+          padding: 10px;
+      }
     </style>
 
     <div class="card">
       <h1>User List</h1>
+        <iron-list items="[[qryData]]" as="user">
+            <template>
+                <div id="userList">
+                    <paper-card class="layout vertical" elevation="2">
+                        <div class="layout horizontal">
+                            <div class="flex">Name: [[user.name]]</div>
+                            <div class="cardActions">
+                                <iron-icon on-click="addFriend" icon="add"></iron-icon>
+                            </div>
+                        </div>
+                        <div class="flex">Email: [[user.email]]</div>
+                    </paper-card>
+                </div>
+            </template>
+        </iron-list>
     </div>
   </template>
 
