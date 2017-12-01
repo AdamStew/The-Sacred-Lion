@@ -30,17 +30,8 @@
 <dom-module id="my-events">
     <template>
 
-        <firebase-app id="myFireApp"
-                      api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
-                      auth-domain="the-sacred-lion.firebaseapp.com"
-                      database-url="https://the-sacred-lion.firebaseio.com"
-                      storage-bucket="the-sacred-lion.appspot.com"
-                      messaging-sender-id="74198786972">
-        </firebase-app>
-
-        <firebase-auth id="auth" user="{{user}}"></firebase-auth>
-
-        <firebase-query path="/users/[[user.uid]]/events" data="{{qryData}}"></firebase-query>
+        <firebase-auth id="auth" app-name="myFireApp" user="{{user}}"></firebase-auth>
+        <firebase-query id="eventsQuery" path="/users/[[user.uid]]/events" app-name="myFireApp" data="{{qryData}}"></firebase-query>
 
         <iron-ajax
                 id="boardGameSearchAjax"
@@ -425,7 +416,7 @@
                         if (bgTime[0] == 12) {
                             fmtTime = bgTime[0] + ":" + bgTime[1]; //Noon.
                         } else {
-                            fmtTime = (bgTime[0] - 12) + ":" + bgTime[1] + " PM"; //1PM-11PM.
+                            fmtTime = (bgTime[0] - 12) + ":" + bgTime[1]; //1PM-11PM.
                         }
                         fmtTime += " PM";
                     } else {
@@ -438,8 +429,8 @@
                     }
 
                     //Add event to the user's event-list.
-                    var dbRef = this.$.myFireApp.app.database();
-                    dbRef.ref("users/" + this.user.uid + "/events").push().set({
+                    var dbRef = this.$.eventsQuery.ref;
+                    dbRef.push().set({
                         gameName: this.gameName, gameId: this.idParam,
                         minPlayers: this.gameMin, maxPlayers: this.gameMax,
                         location: {longitude: this.longitude, latitude: this.latitude},
