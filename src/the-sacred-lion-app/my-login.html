@@ -11,7 +11,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="shared-styles.html">
@@ -20,15 +20,17 @@
 <dom-module id="my-login">
     <template>
 
-        <firebase-app id="myFireApp"
+        <!--<firebase-app id="myFireApp"
+            name="myFireApp"
             api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
             auth-domain="the-sacred-lion.firebaseapp.com"
             database-url="https://the-sacred-lion.firebaseio.com"
             storage-bucket="the-sacred-lion.appspot.com"
             messaging-sender-id="74198786972">
-        </firebase-app>
+        </firebase-app>-->
 
-        <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
+        <firebase-auth app-name="myFireApp" id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
+        <firebase-query app-name="myFireApp" id="query" path="/users"></firebase-query>
 
         <div id="welcomeUser" hidden$="[[!user]]">
             <label>Welcome!</label>
@@ -189,12 +191,13 @@
                 this.$.auth.signOut();
             }
             signedInFirebase(response){
-                var dbRef = this.$.myFireApp.app.database();
-                dbRef.ref("users/" + response.uid)
+                var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
+                console.log(dbRef);
+                dbRef.child(response.uid)
                     .once('value', (snap) => {
                         let result = snap.val();
                         if(result === null){
-                            dbRef.ref('users/' + response.uid)
+                            dbRef.child(response.uid)
                                 .child('private')
                                 .set({ email: response.email })
                         }

@@ -2,7 +2,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="shared-styles.html">
@@ -22,22 +22,22 @@
       }
     </style>
     
-    <firebase-app id="myFireApp"
+    <!--<firebase-app id="myFireApp"
       api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
       auth-domain="the-sacred-lion.firebaseapp.com"
       database-url="https://the-sacred-lion.firebaseio.com"
       storage-bucket="the-sacred-lion.appspot.com"
       messaging-sender-id="74198786972">
-    </firebase-app>
+    </firebase-app>-->
 
-      <firebase-auth id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
+      <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
   
-      <firebase-query path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
+      <firebase-query app-name="myFireApp" id="query" path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
   
       <div class="card" id="userInfo">
         <h2>Private Profile</h2>
         <div>
-            <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.private.name}}"></paper-input>        
+            <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.name}}"></paper-input>        
             <paper-input id='userPhone' always-float-label label="Phone" 
               allowed-pattern='[0-9]+'
               value="{{user.private.phone}}"></paper-input>     
@@ -79,21 +79,22 @@
       }
 
       saveChanges(){
-        var dbRef = this.$.myFireApp.app.database();
+        var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
+        console.log(dbRef);
         delete this.user.$key
         if(this.user.private.shareEmail){
           this.user.email = this.user.private.email;
         }else{
           delete this.user.email;
-          dbRef.ref("users/" + this.authUser.uid).child("email").remove();
+          dbRef.child(this.authUser.uid).child("email").remove();
         }
         if(this.user.private.sharePhone){
           this.user.phone = this.user.private.phone;
         }else{
           delete this.user.phone;
-          dbRef.ref("users/" + this.authUser.uid).child("phone").remove();
+          dbRef.child(this.authUser.uid).child("phone").remove();
         }
-        dbRef.ref("users/" + this.authUser.uid).update(this.user);
+        dbRef.child(this.authUser.uid).update(this.user);
       }
     }
 

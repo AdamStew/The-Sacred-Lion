@@ -1,5 +1,4 @@
-<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-document.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../../bower_components/app-layout/app-header/app-header.html">
@@ -63,9 +62,16 @@
             }
         </style>
 
+        <firebase-app id="myFireApp"
+            name="myFireApp"
+            api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
+            auth-domain="the-sacred-lion.firebaseapp.com"
+            database-url="https://the-sacred-lion.firebaseio.com"
+            storage-bucket="the-sacred-lion.appspot.com"
+            messaging-sender-id="74198786972">
+        </firebase-app>
+
         <firebase-document path="/users/[[user.uid]]/text" data="{{data}}"></firebase-document>
-
-
 
         <app-location
             route="{{route}}"
