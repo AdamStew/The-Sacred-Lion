@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/paper-input/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-private-profile">
@@ -17,28 +21,34 @@
         left:25%;
       }
     </style>
+    
+    <firebase-app id="myFireApp"
+      api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
+      auth-domain="the-sacred-lion.firebaseapp.com"
+      database-url="https://the-sacred-lion.firebaseio.com"
+      storage-bucket="the-sacred-lion.appspot.com"
+      messaging-sender-id="74198786972">
+    </firebase-app>
 
-      <firebase-app id="myFireApp"
-          api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
-          auth-domain="the-sacred-lion.firebaseapp.com"
-          database-url="https://the-sacred-lion.firebaseio.com"
-          storage-bucket="the-sacred-lion.appspot.com"
-          messaging-sender-id="74198786972">
-      </firebase-app>
+      <firebase-auth id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
   
-      <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
-  
+      <firebase-query path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
   
       <div class="card" id="userInfo">
         <h2>Private Profile</h2>
         <div>
-            <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[a-zA-Z0-9]+'></paper-input>        
-            <paper-input id='userPhone' always-float-label label="Phone" allowed-pattern='/(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:(\s*([2-9]1[02-9]|[2-9][02-8]‌​1|[2-9][02-8][02-9])‌​\s*)|([2-9]1[02-9]|[‌​2-9][02-8]1|[2-9][02‌​-8][02-9]))\s*(?:[.-‌​]\s*)?)([2-9]1[02-9]‌​|[2-9][02-9]1|[2-9][‌​02-9]{2})\s*(?:[.-]\‌​s*)?([0-9]{4})/'></paper-input>     
-            <paper-checkbox>Show Phone Publicly</paper-checkbox>
-            <paper-input id='userEmail' always-float-label label="Email">
-              <input type='email' />
+            <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.private.name}}"></paper-input>        
+            <paper-input id='userPhone' always-float-label label="Phone" 
+              allowed-pattern='[0-9]+'
+              value="{{user.private.phone}}"></paper-input>     
+            <paper-checkbox checked="{{user.private.sharePhone}}">Show Phone Publicly</paper-checkbox>
+            <paper-input id='userEmail' always-float-label label="Email" value="{{user.private.email}}">
+              <input type='email'/>
             </paper-input>
-            <paper-checkbox>Show Email Publicly</paper-checkbox>
+            <paper-checkbox checked="{{user.private.shareEmail}}">Show Email Publicly</paper-checkbox>
+            <div>
+              <paper-button raised on-click="saveChanges">Save</paper-button>
+            </div>
         </div>
       </div>
   </template>
@@ -46,6 +56,45 @@
   <script>
     class MyPrivateProfile extends Polymer.Element {
       static get is() { return 'my-private-profile'; }
+      static get properties() {
+          return {
+              qryData: {
+                type: Object,
+                observer: "_setUser"
+              },
+              user: {
+                  type: Object,
+                  value: null,
+              },
+              authUser: {
+                type: Object,
+                notify: true,
+                value: null,
+              }
+          };
+      }
+
+      _setUser(oldVal, newVal){
+        this.user = oldVal[0];
+      }
+
+      saveChanges(){
+        var dbRef = this.$.myFireApp.app.database();
+        delete this.user.$key
+        if(this.user.private.shareEmail){
+          this.user.email = this.user.private.email;
+        }else{
+          delete this.user.email;
+          dbRef.ref("users/" + this.authUser.uid).child("email").remove();
+        }
+        if(this.user.private.sharePhone){
+          this.user.phone = this.user.private.phone;
+        }else{
+          delete this.user.phone;
+          dbRef.ref("users/" + this.authUser.uid).child("phone").remove();
+        }
+        dbRef.ref("users/" + this.authUser.uid).update(this.user);
+      }
     }
 
     window.customElements.define(MyPrivateProfile.is, MyPrivateProfile);
