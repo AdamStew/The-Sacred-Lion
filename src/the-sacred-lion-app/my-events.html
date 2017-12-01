@@ -101,7 +101,7 @@
                 <iron-list items="[[bgResults]]" as="item">
                     <template>
                         <div>
-                            <paper-button on-tap="_selectGameId" data-item$="[[item.id]]">[[item.name]]</paper-button>
+                            <paper-button id="bgRes" on-tap="_selectGameId" data-item$="[[item.id]]">[[item.name]]</paper-button>
                         </div>
                     </template>
                 </iron-list>
@@ -120,7 +120,7 @@
                 <iron-list items="[[locResults]]" as="item">
                     <template>
                         <div>
-                            <paper-button on-tap="_selectLocation" data-item$="[[item]]">[[item.address]]</paper-button>
+                            <paper-button id="locRes" on-tap="_selectLocation" data-item$="[[item]]">[[item.address]]</paper-button>
                         </div>
                     </template>
                 </iron-list>
@@ -128,14 +128,14 @@
 
             <paper-dialog id="pickTime" modal on-iron-overlay-opened="_patchOverlay" on-iron-overlay-closed="_handleTime">
                 <h1>Select Date/Time</h1>
-                <div class="inputs">
+                <div class="layout vertical">
                     <vaadin-date-picker id="dateSelected" label="Date of Event" placeholder="Pick a date" required></vaadin-date-picker><br>
                     <time-element id="timeSelected" time="{{time}}"></time-element>
-
-                </div>
-                <div class="layout horizontal">
-                    <paper-button on-click="_backToLocation">Cancel</paper-button>
-                    <paper-button dialog-confirm>Confirm Time</paper-button>
+                    <div class="layout horizontal">
+                        <paper-button on-click="_backToLocation">Cancel</paper-button>
+                        <paper-button on-click="_confirmData">Confirm Time</paper-button>
+                    </div>
+                    <div id="dateNoResults"></div>
                 </div>
             </paper-dialog>
         </div>
@@ -158,7 +158,8 @@
                 cursor: pointer;
             }
             paper-dialog {
-                padding: 180px;
+                padding-left: 240px;
+                padding-right: 240px;
             }
             time-element {
                 padding: 8px;
@@ -179,10 +180,6 @@
                 border-radius: 8px;
                 padding: 6px;
             }
-            .layout {
-                display: flex;
-                align-items: flex-start;
-            }
             #eventList {
                 padding: 10px;
             }
@@ -195,6 +192,9 @@
             #locNoResults {
                 color: red;
             }
+            #dateNoResults {
+                color: red;
+            }
 
         </style>
     </template>
@@ -205,6 +205,7 @@
         window.onload = function() {
             document.getElementById("bgNoResults").hide();
             document.getElementById("locNoResults").hide();
+            document.getElementById("dateNoResults").hide();
         };
 
         class MyEvents extends Polymer.Element {
@@ -260,6 +261,11 @@
 
                     time: {
                         type: String
+                    },
+
+                    finished: {
+                        type: Boolean,
+                        value: false
                     }
                 };
             }
@@ -348,14 +354,29 @@
                 console.log(this.locResults);
             }
 
+            /* Verifies that the final data has been entered correctly, and ready to launch into Firebase. */
+            _confirmData() {
+                if(this.$.dateSelected.value.length == 0) {
+                    this.$.dateNoResults.innerHTML = "Enter a date.";
+                    this.$.dateNoResults.hidden = false;
+                    this.set("finished", false);
+                } else {
+                    this.$.dateNoResults.hidden = true;
+                    this.$.pickTime.close();
+                    this.set("finished", true);
+                }
+            }
+
             /* Searches for a location using Google Maps API. */
             _searchLocation() {
+                this.set("finished", false);
                 this.$.locNoResults.hidden = true;
                 this.$.locationAjax.generateRequest();
             }
 
             /* Searches for a board game using boardgamegeek API. */
             _searchGame() {
+                this.set("finished", false);
                 this.$.bgNoResults.hidden = true;
                 this.$.boardGameSearchAjax.generateRequest();
             }
@@ -384,13 +405,15 @@
 
             /* Goes backwards a dialog. */
             _backToLocation() {
+                this.$.dateSelected.value = "";
+                this.$.dateNoResults.hidden = true;
                 this.$.pickTime.close();
                 this.$.pickLocation.open();
             }
 
             /* Confirms time and day, and pushes all data to Firebase (since this is last dialog). */
             _handleTime() {
-                if(this.$.pickTime.closingReason.confirmed) {
+                if(this.finished) {
                     //Change format from YYYY-MM-DD -> MM-DD-YYY.
                     var bgDate = this.$.dateSelected.value.split("-");
                     var fmtDate = bgDate[1] + "-" + bgDate[2] + "-" + bgDate[0];
@@ -398,15 +421,15 @@
                     //Change format of the time.
                     var bgTime = this.time.split(":");
                     var fmtTime;
-                    if(bgTime[0] >= 12) {
-                        if(bgTime[0] ==  12) {
+                    if (bgTime[0] >= 12) {
+                        if (bgTime[0] == 12) {
                             fmtTime = bgTime[0] + ":" + bgTime[1]; //Noon.
                         } else {
                             fmtTime = (bgTime[0] - 12) + ":" + bgTime[1] + " PM"; //1PM-11PM.
                         }
                         fmtTime += " PM";
                     } else {
-                        if(bgTime[0] == 0) {
+                        if (bgTime[0] == 0) {
                             fmtTime = 12 + ":" + bgTime[1]; //Midnight.
                         } else {
                             fmtTime = bgTime[0] + ":" + bgTime[1]; //1AM-11AM.
@@ -416,10 +439,22 @@
 
                     //Add event to the user's event-list.
                     var dbRef = this.$.myFireApp.app.database();
-                    dbRef.ref("users/" + this.user.uid + "/events").push().set({gameName: this.gameName, gameId: this.idParam,
+                    dbRef.ref("users/" + this.user.uid + "/events").push().set({
+                        gameName: this.gameName, gameId: this.idParam,
                         minPlayers: this.gameMin, maxPlayers: this.gameMax,
                         location: {longitude: this.longitude, latitude: this.latitude},
-                        time: {date: fmtDate, timeOfDay: fmtTime}, players: "TBD"});
+                        time: {date: fmtDate, timeOfDay: fmtTime}, players: "TBD"
+                    });
+
+                    //Clear all old data after a submission.
+                    this.splice("bgResults", 0, this.bgResults.length);
+                    this.$.bgInput.value = "";
+                    this.$.bgNoResults.hidden = true;
+                    this.splice("locResults", 0, this.locResults.length);
+                    this.$.locationInput.value = "";
+                    this.$.locNoResults.hidden = true;
+                    this.$.dateSelected.value = "";
+                    this.$.dateNoResults.hidden = true;
                 }
             }
 
