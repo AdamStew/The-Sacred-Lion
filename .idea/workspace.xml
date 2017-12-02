@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="5a5d2922-3075-432b-8176-2a4e617df3f3" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/src/the-sacred-lion-app/my-user-list.html" afterPath="$PROJECT_DIR$/src/the-sacred-lion-app/my-user-list.html" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -179,11 +178,18 @@
       <option name="project" value="LOCAL" />
       <updated>1512248513753</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added friend invites to the user list page. I will add a proper button and dialog soon, instead of an iron-icon.">
+      <created>1512256891979</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1512256891979</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="113601000" />
+    <option name="totallyTimeSpent" value="113613000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-11" y="-11" width="1942" height="1042" extended-state="6" />
