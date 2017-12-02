@@ -26,7 +26,7 @@
         <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" data="{{qryData2}}"></firebase-query>
 
         <div class="card" id="userInfo">
-            <h2>Private Profile</h2>
+            <h2>Private Profile | [[authUser.displayName]]</h2>
             <div>
                 <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.name}}"></paper-input>
                 <paper-input id='userPhone' always-float-label label="Phone"
@@ -100,7 +100,10 @@
                 }
                 dbRef.child(this.authUser.uid).update(this.user);
                 dbRef2.update(this.userPrivate);
-                this.authUser.updateProfile({displayName: this.$.userName.value});
+                console.log(this.user.name);
+                this.authUser.updateProfile({displayName: this.user.name}).then(() => {
+                    this.notifyPath(this.authUser.displayName);
+                });
             }
         }
 

@@ -164,7 +164,9 @@
                             this.$.signUpPassword.value.trim())
                             .then(function(response) {
                                 this.signedInFirebase(response);
-                                this.user.updateProfile({displayName: this.$.signUpUsername.value});
+                                this.user.updateProfile({displayName: this.$.signUpUsername.value}).then(() => {
+                                    this.notifyPath(this.user.displayName);
+                                });
                             }.bind(this))
                             .catch(function(error) {
                                 if(error.code == "auth/user-not-found") {
