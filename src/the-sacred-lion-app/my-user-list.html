@@ -17,80 +17,96 @@
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-user-list">
-  <template>
-      <firebase-query app-name="myFireApp" path="/users" data="{{qryData}}" id="query"></firebase-query>
+    <template>
+        <firebase-query app-name="myFireApp" path="/users" data="{{qryData}}" id="query"></firebase-query>
 
-      <firebase-auth app-name="myFireApp" id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
+        <firebase-auth app-name="myFireApp" id="auth" user="{{user}}" provider="email"
+                       on-error="handleError"></firebase-auth>
 
-    <style include="shared-styles iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse">
-      :host {
-        display: block;
+        <style include="shared-styles iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse">
+            :host {
+                display: block;
 
-        padding: 10px;
-      }
-      iron-icon:hover{
-          cursor: pointer;
-      }
-      iron-list {
-          height: 50vh;
-          width: 40vw;
-      }
-      paper-card {
-          width: 100%;
-          background-color: #deffff;
-          border-radius: 8px;
-          padding: 6px;
-      }
-      .layout {
-          display: flex;
-          align-items: flex-start;
-      }
-      #userList {
-          padding: 10px;
-      }
-    </style>
+                padding: 10px;
+            }
 
-    <div class="card">
-      <h1>User List</h1>
-        <iron-list items="[[qryData]]" as="user">
-            <template>
-                <div id="userList">
-                    <paper-card class="layout vertical" elevation="2">
-                        <div class="layout horizontal">
-                            <div class="flex">Name: [[user.name]]</div>
-                            <div class="cardActions">
-                                <iron-icon on-tap="sendFriendInvite" icon="add" user="[[user]]"></iron-icon>
+            iron-icon:hover {
+                cursor: pointer;
+            }
+
+            iron-list {
+                height: 50vh;
+                width: 40vw;
+            }
+
+            paper-card {
+                width: 100%;
+                background-color: #4286f4;
+                border-radius: 8px;
+                padding: 6px;
+                color: white;
+            }
+
+            .layout {
+                display: flex;
+                align-items: flex-start;
+            }
+
+            #userList {
+                padding: 10px;
+            }
+
+            #displayName {
+                font-size: 1.5em;
+            }
+        </style>
+
+        <div class="card">
+            <h1>User List</h1>
+            <iron-list items="[[qryData]]" as="user">
+                <template>
+                    <div id="userList">
+                        <paper-card elevation="2">
+                            <div class="layout horizontal">
+                                <div class="flex">[[user.name]]</div>
+                                <div class="cardActions">
+                                    <iron-icon on-tap="sendFriendInvite" icon="add" user="[[user]]"></iron-icon>
+                                </div>
+                                <div class="cardActions">
+                                    <a href="/public-profile?uid=[[user.$key]]">
+                                        <iron-icon icon="account-box"></iron-icon>
+                                    </a>
+                                </div>
                             </div>
-                            <div class="cardActions">
-                                <a href="/public-profile?uid=[[user.$key]]">
-                                    <iron-icon icon="account-box"></iron-icon>
-                                </a>
-                            </div>
-                        </div>
-                    </paper-card>
-                </div>
-            </template>
-        </iron-list>
-    </div>
-  </template>
+                        </paper-card>
+                    </div>
+                </template>
+            </iron-list>
+        </div>
+    </template>
 
-  <script>
-    class MyUserList extends Polymer.Element {
-      static get is() { return 'my-user-list'; }
-        sendFriendInvite (event) {
-            console.log(event);
-            const dbRef = this.$.query.ref;
-            let selectedUser = event.currentTarget.user.$key;
-            let selectedName = event.currentTarget.user.name;
-            let currentUserId = this.user.uid;
-            //let currentUserName = dbRef.child(currentUserId).child("name");
+    <script>
+        class MyUserList extends Polymer.Element {
+            static get is() {
+                return 'my-user-list';
+            }
 
-            //Creates the friend invite on the selected user's invite page.
-            dbRef.child(selectedUser).child("invites").child("friendInvites").push().set({from: currentUserId,
-            message: selectedName + ", I want to be your friend."});
+            sendFriendInvite(event) {
+                console.log(event);
+                const dbRef = this.$.query.ref;
+                let selectedUser = event.currentTarget.user.$key;
+                let selectedName = event.currentTarget.user.name;
+                let currentUserId = this.user.uid;
+                let currentName = this.user.displayName;
+
+                //Creates the friend invite on the selected user's invite page.
+                dbRef.child(selectedUser).child("invites").child("friendInvites").push().set({
+                    fromUid: currentUserId,
+                    fromName: currentName, message: selectedName + ", I want to be your friend."
+                });
+            }
         }
-    }
 
-    window.customElements.define(MyUserList.is, MyUserList);
-  </script>
+        window.customElements.define(MyUserList.is, MyUserList);
+    </script>
 </dom-module>
