@@ -18,15 +18,7 @@
 
 <dom-module id="my-user-list">
   <template>
-      <firebase-app id="myFireApp"
-                    api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
-                    auth-domain="the-sacred-lion.firebaseapp.com"
-                    database-url="https://the-sacred-lion.firebaseio.com"
-                    storage-bucket="the-sacred-lion.appspot.com"
-                    messaging-sender-id="74198786972">
-      </firebase-app>
-
-      <firebase-query path="/users" data="{{qryData}}"></firebase-query>
+      <firebase-query app-name="myFireApp" path="/users" data="{{qryData}}"></firebase-query>
 
       <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
 
@@ -67,7 +59,7 @@
                         <div class="layout horizontal">
                             <div class="flex">Name: [[user.name]]</div>
                             <div class="cardActions">
-                                <iron-icon on-click="addFriend" icon="add"></iron-icon>
+                                <iron-icon on-tap="addFriend" icon="add" friend="[[friend]]"></iron-icon>
                             </div>
                         </div>
                         <div class="flex">Email: [[user.email]]</div>
@@ -81,6 +73,14 @@
   <script>
     class MyUserList extends Polymer.Element {
       static get is() { return 'my-user-list'; }
+        addFriend (e) {
+            let dbRef = this.$.query.ref;
+            let key = e.currentTarget.friend.$key;
+            let currentUser = this.user.uid;
+
+            console.log(key);
+            dbRef.ref('users' + '/' + currentUser).update({friends: {key}});
+        }
     }
 
     window.customElements.define(MyUserList.is, MyUserList);
