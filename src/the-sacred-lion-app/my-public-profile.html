@@ -1,4 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-public-profile">
@@ -10,9 +13,16 @@
         padding: 10px;
       }
     </style>
+      
+    <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
+    <firebase-query app-name="myFireApp" id="query" path="/users"></firebase-query>
 
     <div class="card">
-      <h1>Public Profile</h1>
+      <h1>[[user.name]]</h1>
+      <div>
+        <div hidden$="[[hideEmail]]">Email: [[user.email]]</div>
+        <div hidden$="[[hidePhone]]">Phone: [[user.phone]]</div>
+      </div>
     </div>
 
   </template>
@@ -22,33 +32,58 @@
       static get is() { return 'my-public-profile'; }
       static get properties() {
         return {
-          uid: {
-            type: Number,
-            observer: "_print",
-          },
-          qryData: {
-            type: Object,
-            observer: "_setUser"
-          },
-          user: {
-              type: Object,
-              value: null,
-          },
           authUser: {
             type: Object,
             notify: true,
             value: null,
+            observer: "_runQuery"
+          },
+          uid: {
+            type: String,
+            observer: "_print",
+          },
+          user: {
+              type: Object,
+              value: null
+          },
+          hideEmail: {
+            type: Boolean,
+            computed: "_hideEmail(user.email)",
+          },
+          hidePhone: {
+            type: Boolean,
+            computed: "_hidePhone(user.phone)"
           }
         };
-      }
-
-      _setUser(oldVal, newVal){
-        this.user = oldVal[0];
       }
 
       _print(oldVal, newVal){
         console.log(oldVal, newVal);
       }
+
+      _hideEmail() {
+        return this.user == null || this.user.email == null || this.user.email.trim().length <= 0;
+      }
+
+      _hidePhone() {
+        return this.user == null || this.user.phone == null || this.user.phone.trim().length <= 0;
+      }
+
+      effectiveUid() {
+        return this.uid || (this.authUser != null ? this.authUser.uid : null);
+      }
+
+      _runQuery(oldVal, newVal){
+        if(this.authUser != null){
+          this.$.query.ref
+            .child(this.effectiveUid())
+            .once('value', (snap) => {
+              this.set('user', snap.val());
+              this.notifyPath('user.email');
+            });
+        }
+      }
+      
     }
 
     window.customElements.define(MyPublicProfile.is, MyPublicProfile);

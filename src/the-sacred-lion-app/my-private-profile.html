@@ -33,7 +33,7 @@
       <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
   
       <firebase-query app-name="myFireApp" id="query" path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
-      <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" ref="" data="{{qryData2}}"></firebase-query>
+      <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" data="{{qryData2}}"></firebase-query>
   
       <div class="card" id="userInfo">
         <h2>Private Profile</h2>
