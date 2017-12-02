@@ -1,26 +1,155 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="imoprt" href="../../bower_components/paper-item/paper-item.html">
+<link rel="imoprt" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="imoprt" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs-icons.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
 
 <dom-module id="my-invites">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
 
-        padding: 10px;
-      }
-    </style>
+        <firebase-auth id="auth" app-name="myFireApp" user="{{user}}"></firebase-auth>
+        <firebase-query id="eventInvQuery" path="/users/[[user.uid]]/invites/eventInvites" app-name="myFireApp" data="{{eventsQry}}"></firebase-query>
+        <firebase-query id="list" path="/users" app-name="myFireApp""></firebase-query>
+        <firebase-query id="friendInvQuery" path="/users/[[user.uid]]/invites/friendInvites" app-name="myFireApp" data="{{friendsQry}}"></firebase-query>
 
-    <div class="card">
-      <h1>Invites</h1>
-    </div>
-  </template>
 
-  <script>
-    class MyInvites extends Polymer.Element {
-      static get is() { return 'my-invites'; }
-    }
+        <div class="card">
+            <h1>Invites | [[user.displayName]]</h1>
+            <paper-tabs selected="{{select}}">
+                <paper-tab on-click="_changeTabZero">Event Invites</paper-tab>
+                <paper-tab on-click="_changeTabOne">Friend Invites</paper-tab>
+            </paper-tabs>
 
-    window.customElements.define(MyInvites.is, MyInvites);
-  </script>
+            <iron-pages selected="[[select]]">
+                <div>
+                    <iron-list id="allEventInv" items="[[eventsQry]]" as="event">
+                        <template>
+                            <div>
+                                <paper-card id="eventInv" class="layout vertical" elevation="2">
+
+                                    <div class="layout horizontal">
+                                        <div class="flex">[[event.message]]</div>
+                                        <iron-icon class="card-actions" icon="check" on-tap="_acceptEvent" data-item$="[[event]]"></iron-icon>
+                                        <iron-icon class="card-actions" icon="close" on-click="_declineEvent"></iron-icon>
+                                    </div>
+                                </paper-card>
+                            </div>
+                        </template>
+                    </iron-list>
+                </div>
+                <div>
+                    <iron-list id="allFriendInv" items="[[friendsQry]]" as="friend">
+                        <template>
+                            <div>
+                                <paper-card id="friendInv" class="layout vertical" elevation="2">
+                                    <div class="layout horizontal">
+                                        <div class="flex">[[friend.message]]</div>
+                                        <iron-icon class="card-actions" icon="check" on-tap="_acceptFriend" data-item$="[[friend]]"></iron-icon>
+                                        <iron-icon class="card-actions" icon="close" on-tap="_declineFriend" invite="[[friend]]"></iron-icon>
+                                    </div>
+                                </paper-card>
+                            </div>
+                        </template>
+                    </iron-list>
+                </div>
+            </iron-pages>
+
+
+        </div>
+
+        <style include="iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+            iron-list {
+                height: 70vh;
+                width: 40vw;
+            }
+            paper-card {
+                width: 100%;
+                background-color: #deffff;
+                border-radius: 8px;
+                padding: 6px;
+            }
+            paper-tabs {
+                cursor: pointer;
+            }
+            iron-icon {
+                 cursor: pointer;
+             }
+
+        </style>
+    </template>
+
+    <script>
+        class MyInvites extends Polymer.Element {
+            static get is() { return 'my-invites'; }
+
+            static get properties() {
+                return {
+                    select: {
+                        type: Number,
+                        value: 0
+                    }
+                }
+            }
+            _acceptEvent(event) {
+                var invStruct = JSON.parse(event.target.dataset.item);
+                //Update your event page.
+                var myEventRef = this.$.list.ref.child(this.user.uid).child("events").child("participatingEvents");
+                myEventRef.push().set({path: invStruct.path});
+                //Update friend's event page.
+                var paths = invStruct.path.split("\\");
+                var hostEventRef = this.$.ref.child(paths[0]).child(paths[1]).child(paths[2]).child(paths[3]).child("players");
+                //This won't update it, just creates a new eleemnt.  Need to fix later.
+                hostEventRef.push().set({friend: this.user.displayName, status: "accepted", uid: this.user.uid});
+            }
+            _declineEvent() {
+                //TODO;
+            }
+
+            _acceptFriend(event) {
+                var invStruct = JSON.parse(event.target.dataset.item);
+                //Put your info in your friend's friendlist.
+                var friendRef = this.$.list.ref.child(invStruct.uid).child("friends");
+                friendRef.push().set({friend: this.user.displayName, uid: this.user.uid});
+                //Put your friend's info in your friendlist.
+                var myRef = this.$.list.ref.child(this.user.uid).child("friends");
+                myRef.push().set({friend: invStruct.fromUser, uid: invStruct.fromUid});
+            }
+            _declineFriend(event) {
+                //Declined.
+                var key = event.currentTarget.friend.$key;
+                this.$.list.ref.child(this.user.uid).child("invites").child("friendInvites").child(key).remove();
+            }
+
+            _changeTabZero() {
+                this.select = 0;
+            }
+            _changeTabOne() {
+                this.select = 1;
+            }
+        }
+
+        window.customElements.define(MyInvites.is, MyInvites);
+    </script>
 </dom-module>

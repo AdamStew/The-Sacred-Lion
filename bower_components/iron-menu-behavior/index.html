@@ -8,29 +8,23 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
 <html>
-  <head>
+<head>
 
-    <meta charset="utf-8">
-    <title>Tests</title>
-    <script src="../../web-component-tester/browser.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-  </head>
-  <body>
+  <title>iron-menu-behavior</title>
 
-    <script>
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
 
-      WCT.loadSuites([
-        'basic.html?dom=shadow',
-        'basic.html?wc-shadydom=true&wc-ce=true',
-        'attr-for-selected.html?dom=shadow',
-        'attr-for-selected.html?wc-shadydom=true&wc-ce=true',
-        'nested.html?dom=shadow',
-        'nested.html?wc-shadydom=true&wc-ce=true',
-      ]);
+  <link rel="import" href="../polymer/polymer.html">
+  <link rel="import" href="../iron-component-page/iron-component-page.html">
 
-    </script>
+</head>
+<body>
 
-  </body>
+  <iron-component-page src="iron-menubar-behavior.html"></iron-component-page>
+
+</body>
 </html>

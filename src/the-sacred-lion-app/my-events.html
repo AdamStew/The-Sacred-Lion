@@ -31,7 +31,7 @@
     <template>
 
         <firebase-auth id="auth" app-name="myFireApp" user="{{user}}"></firebase-auth>
-        <firebase-query id="eventsQuery" path="/users/[[user.uid]]/events" app-name="myFireApp" data="{{qryData}}"></firebase-query>
+        <firebase-query id="eventsQuery" path="/users/[[user.uid]]/events/hostEvents" app-name="myFireApp" data="{{qryData}}"></firebase-query>
         <firebase-query id="friendsQuery" path="/users/[[user.uid]]/friends" app-name="myFireApp" data="{{friendsQry}}"></firebase-query>
         <firebase-query id="msgQuery" path="/users" app-name="myFireApp" data="{{msgQry}}"></firebase-query>
 
@@ -512,14 +512,10 @@
                         time: {date: fmtDate, timeOfDay: fmtTime}, players: this.participants, status: "ongoing"
                     });
 
-                    //Send invites.
-                    console.log(this.user.uid);
-                    var myName;
-                    var myNameRef = this.$.msgQuery.ref.child(this.user.uid).child("name");
                     for(var i=0; i < this.participants.length; i++) {
                         var sendRef = this.$.msgQuery.ref.child(this.participants[i].uid).child("invites").child("eventInvites");
-                        var gamePath = dbRef.toString().substr(38); //Chop off junk.
-                        sendRef.push().set({message: "Come play " + this.gameName + " with me on "
+                        var gamePath = dbRef.toString().substr(44); //Chop off junk.
+                        sendRef.push().set({fromUser: this.user.displayName, fromUid: this.user.uid, message: "Come play " + this.gameName + " with me on "
                         + fmtDate + " at " + fmtTime + ".", path: gamePath});
                     }
 

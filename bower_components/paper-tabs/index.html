@@ -8,29 +8,18 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
-
 <html>
-  <head>
+<head>
 
-    <meta charset="utf-8">
-    <title>Tests</title>
-    <script src="../../web-component-tester/browser.js"></script>
+  <title>paper-tabs</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../iron-component-page/iron-component-page.html">
 
-  </head>
-  <body>
+</head>
+<body>
 
-    <script>
+  <iron-component-page sources='["paper-tabs.html", "paper-tab.html"]'></iron-component-page>
 
-      WCT.loadSuites([
-        'basic.html?dom=shadow',
-        'basic.html?wc-shadydom=true&wc-ce=true',
-        'attr-for-selected.html?dom=shadow',
-        'attr-for-selected.html?wc-shadydom=true&wc-ce=true',
-        'nested.html?dom=shadow',
-        'nested.html?wc-shadydom=true&wc-ce=true',
-      ]);
-
-    </script>
-
-  </body>
+</body>
 </html>
