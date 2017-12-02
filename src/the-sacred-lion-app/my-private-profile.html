@@ -33,6 +33,7 @@
       <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
   
       <firebase-query app-name="myFireApp" id="query" path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
+      <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" data="{{qryData2}}"></firebase-query>
   
       <div class="card" id="userInfo">
         <h2>Private Profile</h2>
@@ -40,12 +41,12 @@
             <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.name}}"></paper-input>        
             <paper-input id='userPhone' always-float-label label="Phone" 
               allowed-pattern='[0-9]+'
-              value="{{user.private.phone}}"></paper-input>     
-            <paper-checkbox checked="{{user.private.sharePhone}}">Show Phone Publicly</paper-checkbox>
-            <paper-input id='userEmail' always-float-label label="Email" value="{{user.private.email}}">
+              value="{{userPrivate.phone}}"></paper-input>     
+            <paper-checkbox checked="{{userPrivate.sharePhone}}">Show Phone Publicly</paper-checkbox>
+            <paper-input id='userEmail' always-float-label label="Email" value="{{userPrivate.email}}">
               <input type='email'/>
             </paper-input>
-            <paper-checkbox checked="{{user.private.shareEmail}}">Show Email Publicly</paper-checkbox>
+            <paper-checkbox checked="{{userPrivate.shareEmail}}">Show Email Publicly</paper-checkbox>
             <div>
               <paper-button raised on-click="saveChanges">Save</paper-button>
             </div>
@@ -62,7 +63,15 @@
                 type: Object,
                 observer: "_setUser"
               },
+              qryData2: {
+                type: Object,
+                observer: "_setUserPrivate"
+              },
               user: {
+                  type: Object,
+                  value: null,
+              },
+              userPrivate: {
                   type: Object,
                   value: null,
               },
@@ -78,23 +87,29 @@
         this.user = oldVal[0];
       }
 
+      _setUserPrivate(oldVal, newVal){
+        this.userPrivate = _.fromPairs(_.map(oldVal, (m) => { return _.values(m); }))
+      }
+
       saveChanges(){
         var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
-        console.log(dbRef);
+        var dbRef2 = this.$.query2.ref;
         delete this.user.$key
-        if(this.user.private.shareEmail){
-          this.user.email = this.user.private.email;
+        delete this.userPrivate.$key;
+        if(this.userPrivate.shareEmail){
+          this.user.email = this.userPrivate.email;
         }else{
           delete this.user.email;
           dbRef.child(this.authUser.uid).child("email").remove();
         }
-        if(this.user.private.sharePhone){
-          this.user.phone = this.user.private.phone;
+        if(this.userPrivate.sharePhone){
+          this.user.phone = this.userPrivate.phone;
         }else{
           delete this.user.phone;
           dbRef.child(this.authUser.uid).child("phone").remove();
         }
         dbRef.child(this.authUser.uid).update(this.user);
+        dbRef2.update(this.userPrivate);
       }
     }
 

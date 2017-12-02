@@ -31,6 +31,7 @@
 
         <firebase-auth app-name="myFireApp" id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
         <firebase-query app-name="myFireApp" id="query" path="/users"></firebase-query>
+        <firebase-query app-name="myFireApp" id="query2" path="/users-private"></firebase-query>
 
         <div id="welcomeUser" hidden$="[[!user]]">
             <label>Welcome!</label>
@@ -192,13 +193,20 @@
             }
             signedInFirebase(response){
                 var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
-                console.log(dbRef);
-                dbRef.child(response.uid)
+                var dbRef2 = this.$.query2.ref;
+                dbRef2.child(response.uid)
                     .once('value', (snap) => {
                         let result = snap.val();
                         if(result === null){
                             dbRef.child(response.uid)
-                                .child('private')
+                                .set({ name: resonse.email.split('@')[0] })
+                        }
+                    });
+                dbRef2.child(response.uid)
+                    .once('value', (snap) => {
+                        let result = snap.val();
+                        if(result === null){
+                            dbRef2.child(response.uid)
                                 .set({ email: response.email })
                         }
                     });

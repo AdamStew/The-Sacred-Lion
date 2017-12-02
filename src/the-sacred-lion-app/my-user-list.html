@@ -18,9 +18,9 @@
 
 <dom-module id="my-user-list">
   <template>
-      <firebase-query app-name="myFireApp" path="/users" data="{{qryData}}"></firebase-query>
+      <firebase-query app-name="myFireApp" path="/users" data="{{qryData}}" id="query"></firebase-query>
 
-      <firebase-auth id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
+      <firebase-auth app-name="myFireApp" id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
 
     <style include="shared-styles iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse">
       :host {
@@ -59,10 +59,14 @@
                         <div class="layout horizontal">
                             <div class="flex">Name: [[user.name]]</div>
                             <div class="cardActions">
-                                <iron-icon on-tap="addFriend" icon="add" friend="[[friend]]"></iron-icon>
+                                <iron-icon on-tap="sendFriendInvite" icon="add" user="[[user]]"></iron-icon>
+                            </div>
+                            <div class="cardActions">
+                                <a href="/public-profile?uid=[[user.$key]]">
+                                    <iron-icon icon="account-box"></iron-icon>
+                                </a>
                             </div>
                         </div>
-                        <div class="flex">Email: [[user.email]]</div>
                     </paper-card>
                 </div>
             </template>
@@ -73,13 +77,17 @@
   <script>
     class MyUserList extends Polymer.Element {
       static get is() { return 'my-user-list'; }
-        addFriend (e) {
-            let dbRef = this.$.query.ref;
-            let key = e.currentTarget.friend.$key;
-            let currentUser = this.user.uid;
+        sendFriendInvite (event) {
+            console.log(event);
+            const dbRef = this.$.query.ref;
+            let selectedUser = event.currentTarget.user.$key;
+            let selectedName = event.currentTarget.user.name;
+            let currentUserId = this.user.uid;
+            //let currentUserName = dbRef.child(currentUserId).child("name");
 
-            console.log(key);
-            dbRef.ref('users' + '/' + currentUser).update({friends: {key}});
+            //Creates the friend invite on the selected user's invite page.
+            dbRef.child(selectedUser).child("invites").child("friendInvites").push().set({from: currentUserId,
+            message: selectedName + ", I want to be your friend."});
         }
     }
 
