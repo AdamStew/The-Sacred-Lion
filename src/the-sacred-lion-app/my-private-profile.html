@@ -109,7 +109,7 @@
           dbRef.child(this.authUser.uid).child("phone").remove();
         }
         dbRef.child(this.authUser.uid).update(this.user);
-        dbRef2.child(this.authUser.uid).update(this.userPrivate);
+        dbRef2.update(this.userPrivate);
       }
     }
 
