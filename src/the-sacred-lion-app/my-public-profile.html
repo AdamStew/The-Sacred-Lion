@@ -20,6 +20,35 @@
   <script>
     class MyPublicProfile extends Polymer.Element {
       static get is() { return 'my-public-profile'; }
+      static get properties() {
+        return {
+          uid: {
+            type: Number,
+            observer: "_print",
+          },
+          qryData: {
+            type: Object,
+            observer: "_setUser"
+          },
+          user: {
+              type: Object,
+              value: null,
+          },
+          authUser: {
+            type: Object,
+            notify: true,
+            value: null,
+          }
+        };
+      }
+
+      _setUser(oldVal, newVal){
+        this.user = oldVal[0];
+      }
+
+      _print(oldVal, newVal){
+        console.log(oldVal, newVal);
+      }
     }
 
     window.customElements.define(MyPublicProfile.is, MyPublicProfile);

@@ -99,7 +99,7 @@
                         <a name="events" href="[[rootPath]]events">Events</a>
                         <a name="invites" href="[[rootPath]]invites">Invites</a>
                         <a name="private-profile" href="[[rootPath]]private-profile">Private Profile</a>
-                        <a name="public-profile" href="[[rootPath]]public-profile">Public Profile</a>
+                        <a name="public-profile" href="[[rootPath]]public-profile?uid=[[routeData.uid]]">Public Profile</a>
                         <a name="user-list" href="[[rootPath]]user-list">User List</a>
                         <a name="user-stats" href="[[rootPath]]user-stats">User Stats</a>
                     </div>
@@ -121,7 +121,7 @@
                     <my-events name="events" user="{{user}}"></my-events>
                     <my-invites name="invites"></my-invites>
                     <my-private-profile name="private-profile"></my-private-profile>
-                    <my-public-profile name="public-profile"></my-public-profile>
+                    <my-public-profile name="public-profile" uid="[[subroute.__queryParams.uid]]"></my-public-profile>
                     <my-user-list name="user-list"></my-user-list>
                     <my-user-stats name="user-stats"></my-user-stats>
                     <my-view404 name="view404"></my-view404>
@@ -141,8 +141,14 @@
                         reflectToAttribute: true,
                         observer: '_pageChanged',
                     },
-                    routeData: Object,
-                    subroute: String,
+                    routeData: {
+                        type: Object,
+                        //observer: "_print"
+                    },
+                    subroute:{
+                        type: Object,
+                        //observer: "_print"
+                    },
                     // This shouldn't be neccessary, but the Analyzer isn't picking up
                     // Polymer.Element#rootPath
                     rootPath: String,
@@ -178,6 +184,10 @@
             }
             _signOut() {
                 this.$.auth.signOut();
+            }
+
+            _print(oldVal, newVal) {
+                console.log(oldVal, newVal);
             }
         }
 
