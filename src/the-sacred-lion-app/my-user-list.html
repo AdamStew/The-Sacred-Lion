@@ -61,6 +61,11 @@
                             <div class="cardActions">
                                 <iron-icon on-tap="sendFriendInvite" icon="add" user="[[user]]"></iron-icon>
                             </div>
+                            <div class="cardActions">
+                                <a href="/public-profile?uid=[[user.$key]]">
+                                    <iron-icon icon="account-box"></iron-icon>
+                                </a>
+                            </div>
                         </div>
                     </paper-card>
                 </div>
@@ -73,6 +78,7 @@
     class MyUserList extends Polymer.Element {
       static get is() { return 'my-user-list'; }
         sendFriendInvite (event) {
+            console.log(event);
             const dbRef = this.$.query.ref;
             let selectedUser = event.currentTarget.user.$key;
             let selectedName = event.currentTarget.user.name;
