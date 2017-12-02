@@ -32,7 +32,8 @@
 
         <firebase-auth id="auth" app-name="myFireApp" user="{{user}}"></firebase-auth>
         <firebase-query id="eventsQuery" path="/users/[[user.uid]]/events" app-name="myFireApp" data="{{qryData}}"></firebase-query>
-        <firebase-query id="friendsQuery" path="/users/[[user.uid]]/friends" app-name="myFireApp" data="{{friendQry}}"></firebase-query>
+        <firebase-query id="friendsQuery" path="/users/[[user.uid]]/friends" app-name="myFireApp" data="{{friendsQry}}"></firebase-query>
+        <firebase-query id="msgQuery" path="/users" app-name="myFireApp" data="{{msgQry}}"></firebase-query>
 
         <iron-ajax
                 id="boardGameSearchAjax"
@@ -69,8 +70,10 @@
                                     <h4>Players:</h4>
                                     <iron-list id="inviteesList" items="[[event.players]]" as="invitees">
                                         <template>
-                                            <div>
-                                                • [[invitees.friend]] - Status: [[invitees.status]]
+                                            <div class="layout vertical">
+                                                <div><b>• [[invitees.friend]]</b></div>
+                                                <div><i>Status: [[invitees.status]]</i></div>
+                                                <br>
                                             </div>
                                         </template>
                                     </iron-list>
@@ -135,7 +138,7 @@
                         <paper-button on-click="_confirmInvites">Confirm</paper-button>
                     </div>
                 </div>
-                <iron-list items="[[friendQry]]" as="item">
+                <iron-list items="[[friendsQry]]" as="item">
                     <template>
                         <div>
                             <paper-button id="friendRes" toggles raised class="red" on-tap="_sendInvites" data-item$="[[item]]">[[item.friend]]</paper-button>
@@ -398,9 +401,8 @@
                     this.set("finished", true);
                     //Change friend data to a better JSON.
                     for(var i=0; i < this.participants.length; i++) {
-                        this.participants[i] = {friend: this.participants[i], status: "pending"};
+                        this.participants[i] = JSON.parse(this.participants[i]);
                     }
-                    console.log(this.participants);
                 }
             }
 
@@ -420,10 +422,20 @@
 
             /* Sets up who gets invited or not. */
             _sendInvites(event) {
-                if(this.participants.indexOf(JSON.parse(event.target.dataset.item).friend) > -1) {
-                    this.pop("participants", JSON.parse(event.target.dataset.item).friend);
+                var str = "{\"friend\": \"" + JSON.parse(event.target.dataset.item).friend + "\", \"uid\": \""
+                    + JSON.parse(event.target.dataset.item).uid + "\", \"status\": \"pending\"}"
+                if(this.participants.indexOf(str) > -1) {
+                    var rightGuy = this.pop("participants", str);
+                    var otherGuys = new Array();
+                    while(rightGuy != str) { //Basically look for a specific person, and only remove them.
+                        otherGuys.push(rightGuy);
+                        rightGuy = this.pop("participants", str);
+                    }
+                    for(var i=0; i < otherGuys.length; i++) {
+                        this.push("participants", otherGuys[i]);
+                    }
                 } else {
-                    this.push("participants", JSON.parse(event.target.dataset.item).friend);
+                    this.push("participants", str);
                 }
             }
 
@@ -491,13 +503,25 @@
                     }
 
                     //Add event to the user's event-list.
-                    var dbRef = this.$.eventsQuery.ref;
-                    dbRef.push().set({
+                    var dbListRef = this.$.eventsQuery.ref;
+                    var dbRef = dbListRef.push();
+                    dbRef.set({
                         gameName: this.gameName, gameId: this.idParam,
                         minPlayers: this.gameMin, maxPlayers: this.gameMax,
                         location: {longitude: this.longitude, latitude: this.latitude},
                         time: {date: fmtDate, timeOfDay: fmtTime}, players: this.participants, status: "ongoing"
                     });
+
+                    //Send invites.
+                    console.log(this.user.uid);
+                    var myName;
+                    var myNameRef = this.$.msgQuery.ref.child(this.user.uid).child("name");
+                    for(var i=0; i < this.participants.length; i++) {
+                        var sendRef = this.$.msgQuery.ref.child(this.participants[i].uid).child("invites").child("eventInvites");
+                        var gamePath = dbRef.toString().substr(38); //Chop off junk.
+                        sendRef.push().set({message: "Come play " + this.gameName + " with me on "
+                        + fmtDate + " at " + fmtTime + ".", path: gamePath});
+                    }
 
                     //Clear all old data after a submission.
                     this.splice("bgResults", 0, this.bgResults.length);
