@@ -32,6 +32,7 @@
 
         <firebase-auth id="auth" app-name="myFireApp" user="{{user}}"></firebase-auth>
         <firebase-query id="eventsQuery" path="/users/[[user.uid]]/events" app-name="myFireApp" data="{{qryData}}"></firebase-query>
+        <firebase-query id="friendsQuery" path="/users/[[user.uid]]/friends" app-name="myFireApp" data="{{friendQry}}"></firebase-query>
 
         <iron-ajax
                 id="boardGameSearchAjax"
@@ -64,7 +65,16 @@
                         <paper-card id="events" class="layout vertical" elevation="2">
                             <h3>[[event.gameName]] - [[event.time.date]] @ [[event.time.timeOfDay]]</h3>
                             <div class="layout horizontal-reverse">
-                                <div id="players" class="flex">Players: [[event.players]]</div>
+                                <div id="players" class="flex">
+                                    <h4>Players:</h4>
+                                    <iron-list id="inviteesList" items="[[event.players]]" as="invitees">
+                                        <template>
+                                            <div>
+                                                • [[invitees.friend]] - Status: [[invitees.status]]
+                                            </div>
+                                        </template>
+                                    </iron-list>
+                                </div>
                                 <google-map latitude="[[event.location.latitude]]" longitude="[[event.location.longitude]]"
                                             api-key="AIzaSyBlgE4O9hgijK1uAOARzCsP7zg3JICHybo" zoom="15" disable-default-ui>
                                     <google-map-marker latitude="[[event.location.latitude]]"
@@ -117,13 +127,30 @@
                 </iron-list>
             </paper-dialog>
 
+            <paper-dialog id="pickParticipants" modal on-iron-overlay-opened="_patchOverlay">
+                <h1>Select Participants</h1>
+                <div>
+                    <div class="layout horizontal">
+                        <paper-button on-click="_backToLocation">Back</paper-button>
+                        <paper-button on-click="_confirmInvites">Confirm</paper-button>
+                    </div>
+                </div>
+                <iron-list items="[[friendQry]]" as="item">
+                    <template>
+                        <div>
+                            <paper-button id="friendRes" toggles raised class="red" on-tap="_sendInvites" data-item$="[[item]]">[[item.friend]]</paper-button>
+                        </div>
+                    </template>
+                </iron-list>
+            </paper-dialog>
+
             <paper-dialog id="pickTime" modal on-iron-overlay-opened="_patchOverlay" on-iron-overlay-closed="_handleTime">
                 <h1>Select Date/Time</h1>
                 <div class="layout vertical">
                     <vaadin-date-picker id="dateSelected" label="Date of Event" placeholder="Pick a date" required></vaadin-date-picker><br>
                     <time-element id="timeSelected" time="{{time}}"></time-element>
                     <div class="layout horizontal">
-                        <paper-button on-click="_backToLocation">Cancel</paper-button>
+                        <paper-button on-click="_backToFriends">Back</paper-button>
                         <paper-button on-click="_confirmData">Confirm Time</paper-button>
                     </div>
                     <div id="dateNoResults"></div>
@@ -186,6 +213,9 @@
             #dateNoResults {
                 color: red;
             }
+            #inviteesList {
+                height: 25vh;
+            }
 
         </style>
     </template>
@@ -230,6 +260,11 @@
 
                     gameMin: {
                         type: String
+                    },
+
+                    participants: {
+                        type: Array,
+                        value: []
                     },
 
                     locationParam: {
@@ -280,7 +315,7 @@
                 this.set("longitude", JSON.parse(event.target.dataset.item).long);
                 this.set("latitude", JSON.parse(event.target.dataset.item).lat);
                 this.$.pickLocation.close();
-                this.$.pickTime.open();
+                this.$.pickParticipants.open();
             }
 
             /* Whenever search input changes, change our parameters in the Google Maps API. */
@@ -345,6 +380,12 @@
                 console.log(this.locResults);
             }
 
+            _confirmInvites() {
+                console.log(this.participants);
+                this.$.pickParticipants.close();
+                this.$.pickTime.open();
+            }
+
             /* Verifies that the final data has been entered correctly, and ready to launch into Firebase. */
             _confirmData() {
                 if(this.$.dateSelected.value.length == 0) {
@@ -355,6 +396,11 @@
                     this.$.dateNoResults.hidden = true;
                     this.$.pickTime.close();
                     this.set("finished", true);
+                    //Change friend data to a better JSON.
+                    for(var i=0; i < this.participants.length; i++) {
+                        this.participants[i] = {friend: this.participants[i], status: "pending"};
+                    }
+                    console.log(this.participants);
                 }
             }
 
@@ -370,6 +416,15 @@
                 this.set("finished", false);
                 this.$.bgNoResults.hidden = true;
                 this.$.boardGameSearchAjax.generateRequest();
+            }
+
+            /* Sets up who gets invited or not. */
+            _sendInvites(event) {
+                if(this.participants.indexOf(JSON.parse(event.target.dataset.item).friend) > -1) {
+                    this.pop("participants", JSON.parse(event.target.dataset.item).friend);
+                } else {
+                    this.push("participants", JSON.parse(event.target.dataset.item).friend);
+                }
             }
 
             /* Starts the event creation process. */
@@ -396,10 +451,17 @@
 
             /* Goes backwards a dialog. */
             _backToLocation() {
+                this.splice("participants", 0, this.participants.length); //Clear out old results.
+                this.$.pickParticipants.close();
+                this.$.pickLocation.open();
+            }
+
+            /* Goes backwards a dialog. */
+            _backToFriends() {
                 this.$.dateSelected.value = "";
                 this.$.dateNoResults.hidden = true;
                 this.$.pickTime.close();
-                this.$.pickLocation.open();
+                this.$.pickParticipants.open();
             }
 
             /* Confirms time and day, and pushes all data to Firebase (since this is last dialog). */
@@ -434,7 +496,7 @@
                         gameName: this.gameName, gameId: this.idParam,
                         minPlayers: this.gameMin, maxPlayers: this.gameMax,
                         location: {longitude: this.longitude, latitude: this.latitude},
-                        time: {date: fmtDate, timeOfDay: fmtTime}, players: "TBD"
+                        time: {date: fmtDate, timeOfDay: fmtTime}, players: this.participants, status: "ongoing"
                     });
 
                     //Clear all old data after a submission.
