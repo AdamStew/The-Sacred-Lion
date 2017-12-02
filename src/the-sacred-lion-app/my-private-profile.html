@@ -8,111 +8,102 @@
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-private-profile">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
 
-        padding: 10px;
-      }
+            .card {
+                width: 25%;
+                left:25%;
+            }
+        </style>
 
-      .card {
-        width: 25%;
-        left:25%;
-      }
-    </style>
-    
-    <!--<firebase-app id="myFireApp"
-      api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
-      auth-domain="the-sacred-lion.firebaseapp.com"
-      database-url="https://the-sacred-lion.firebaseio.com"
-      storage-bucket="the-sacred-lion.appspot.com"
-      messaging-sender-id="74198786972">
-    </firebase-app>-->
+        <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
+        <firebase-query app-name="myFireApp" id="query" path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
+        <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" data="{{qryData2}}"></firebase-query>
 
-      <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
-  
-      <firebase-query app-name="myFireApp" id="query" path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
-      <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" data="{{qryData2}}"></firebase-query>
-  
-      <div class="card" id="userInfo">
-        <h2>Private Profile</h2>
-        <div>
-            <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.name}}"></paper-input>        
-            <paper-input id='userPhone' always-float-label label="Phone" 
-              allowed-pattern='[0-9]+'
-              value="{{userPrivate.phone}}"></paper-input>     
-            <paper-checkbox checked="{{userPrivate.sharePhone}}">Show Phone Publicly</paper-checkbox>
-            <paper-input id='userEmail' always-float-label label="Email" value="{{userPrivate.email}}">
-              <input type='email'/>
-            </paper-input>
-            <paper-checkbox checked="{{userPrivate.shareEmail}}">Show Email Publicly</paper-checkbox>
+        <div class="card" id="userInfo">
+            <h2>Private Profile</h2>
             <div>
-              <paper-button raised on-click="saveChanges">Save</paper-button>
+                <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.name}}"></paper-input>
+                <paper-input id='userPhone' always-float-label label="Phone"
+                             allowed-pattern='[0-9]+'
+                             value="{{userPrivate.phone}}"></paper-input>
+                <paper-checkbox checked="{{userPrivate.sharePhone}}">Show Phone Publicly</paper-checkbox>
+                <paper-input id='userEmail' always-float-label label="Email" value="{{userPrivate.email}}">
+                    <input type='email'/>
+                </paper-input>
+                <paper-checkbox checked="{{userPrivate.shareEmail}}">Show Email Publicly</paper-checkbox>
+                <div>
+                    <paper-button raised on-click="saveChanges">Save</paper-button>
+                </div>
             </div>
         </div>
-      </div>
-  </template>
+    </template>
 
-  <script>
-    class MyPrivateProfile extends Polymer.Element {
-      static get is() { return 'my-private-profile'; }
-      static get properties() {
-          return {
-              qryData: {
-                type: Object,
-                observer: "_setUser"
-              },
-              qryData2: {
-                type: Object,
-                observer: "_setUserPrivate"
-              },
-              user: {
-                  type: Object,
-                  value: null,
-              },
-              userPrivate: {
-                  type: Object,
-                  value: null,
-              },
-              authUser: {
-                type: Object,
-                notify: true,
-                value: null,
-              }
-          };
-      }
+    <script>
+        class MyPrivateProfile extends Polymer.Element {
+            static get is() { return 'my-private-profile'; }
+            static get properties() {
+                return {
+                    qryData: {
+                        type: Object,
+                        observer: "_setUser"
+                    },
+                    qryData2: {
+                        type: Object,
+                        observer: "_setUserPrivate"
+                    },
+                    user: {
+                        type: Object,
+                        value: null,
+                    },
+                    userPrivate: {
+                        type: Object,
+                        value: null,
+                    },
+                    authUser: {
+                        type: Object,
+                        notify: true,
+                        value: null,
+                    }
+                };
+            }
 
-      _setUser(oldVal, newVal){
-        this.user = oldVal[0];
-      }
+            _setUser(oldVal, newVal){
+                this.user = oldVal[0];
+            }
 
-      _setUserPrivate(oldVal, newVal){
-        this.userPrivate = _.fromPairs(_.map(oldVal, (m) => { return _.values(m); }))
-      }
+            _setUserPrivate(oldVal, newVal){
+                this.userPrivate = _.fromPairs(_.map(oldVal, (m) => { return _.values(m); }))
+            }
 
-      saveChanges(){
-        var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
-        var dbRef2 = this.$.query2.ref;
-        delete this.user.$key
-        delete this.userPrivate.$key;
-        if(this.userPrivate.shareEmail){
-          this.user.email = this.userPrivate.email;
-        }else{
-          delete this.user.email;
-          dbRef.child(this.authUser.uid).child("email").remove();
+            saveChanges(){
+                var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
+                var dbRef2 = this.$.query2.ref;
+                delete this.user.$key
+                delete this.userPrivate.$key;
+                if(this.userPrivate.shareEmail){
+                    this.user.email = this.userPrivate.email;
+                }else{
+                    delete this.user.email;
+                    dbRef.child(this.authUser.uid).child("email").remove();
+                }
+                if(this.userPrivate.sharePhone){
+                    this.user.phone = this.userPrivate.phone;
+                }else{
+                    delete this.user.phone;
+                    dbRef.child(this.authUser.uid).child("phone").remove();
+                }
+                dbRef.child(this.authUser.uid).update(this.user);
+                dbRef2.update(this.userPrivate);
+                this.authUser.updateProfile({displayName: this.$.userName.value});
+            }
         }
-        if(this.userPrivate.sharePhone){
-          this.user.phone = this.userPrivate.phone;
-        }else{
-          delete this.user.phone;
-          dbRef.child(this.authUser.uid).child("phone").remove();
-        }
-        dbRef.child(this.authUser.uid).update(this.user);
-        dbRef2.update(this.userPrivate);
-      }
-    }
 
-    window.customElements.define(MyPrivateProfile.is, MyPrivateProfile);
-  </script>
+        window.customElements.define(MyPrivateProfile.is, MyPrivateProfile);
+    </script>
 </dom-module>

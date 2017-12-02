@@ -20,15 +20,6 @@
 <dom-module id="my-login">
     <template>
 
-        <!--<firebase-app id="myFireApp"
-            name="myFireApp"
-            api-key="AIzaSyAoXAShsIH94YLfWsPJV05quz02_6QY1qE"
-            auth-domain="the-sacred-lion.firebaseapp.com"
-            database-url="https://the-sacred-lion.firebaseio.com"
-            storage-bucket="the-sacred-lion.appspot.com"
-            messaging-sender-id="74198786972">
-        </firebase-app>-->
-
         <firebase-auth app-name="myFireApp" id="auth" user="{{user}}" provider="email" on-error="handleError"></firebase-auth>
         <firebase-query app-name="myFireApp" id="query" path="/users"></firebase-query>
         <firebase-query app-name="myFireApp" id="query2" path="/users-private"></firebase-query>
@@ -48,11 +39,16 @@
                 </tr>
                 <tr>
                     <td><paper-input id="logInPassword" type="password" label="Password" tabindex="2"></paper-input></td>
-                    <td><paper-input id="signUpPassword" type="password" label="Password" tabindex="4"></paper-input></td>
+                    <td><paper-input id="signUpUsername" label="Username" allowed-pattern='[A-Za-z \.]+' tabindex="4"></paper-input></td>
                 </tr>
                 <tr>
                     <td><!--Filler--></td>
-                    <td><paper-input id="passwordConfirm" type="password" label="Password Confirmation" tabindex="5">
+                    <td><paper-input id="signUpPassword" type="password" label="Password" tabindex="5"></paper-input></td>
+                    </paper-input></td>
+                </tr>
+                <tr>
+                    <td><!--Filler--></td>\
+                    <td><paper-input id="passwordConfirm" type="password" label="Password Confirmation" tabindex="6">
                     </paper-input></td>
                 </tr>
                 <tr>
@@ -149,7 +145,7 @@
                             } else if(error.code == "auth/invalid-email") {
                                 this.$.errContents.innerHTML = "Please enter a valid email address.";
                             } else if(error.code == "auth/wrong-password") {
-                                this.$.errContents.innerHTML = "Invalid password."
+                                this.$.errContents.innerHTML = "Invalid password.";
                             } else {
                                 this.$.errContents.innerHTML = error.message; //All other errors.
                             }
@@ -160,14 +156,15 @@
             _signUp() {
                 //Do stuff for signing up.
                 if(this.$.signUpEmail.value != null && this.$.signUpPassword.value != null &&
-                    this.$.passwordConfirm != null) {
+                    this.$.passwordConfirm.value != null && this.$.signUpUsername.value != null) {
                     //console.log("USERNAME: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
                     if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
                         console.log("Passwords match!");
                         this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
                             this.$.signUpPassword.value.trim())
                             .then(function(response) {
-                                this.signedInFirebase(response)
+                                this.signedInFirebase(response);
+                                this.user.updateProfile({displayName: this.$.signUpUsername.value});
                             }.bind(this))
                             .catch(function(error) {
                                 if(error.code == "auth/user-not-found") {
