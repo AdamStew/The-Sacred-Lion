@@ -26,8 +26,8 @@
 
         <firebase-auth id="auth" app-name="myFireApp" user="{{user}}"></firebase-auth>
         <firebase-query id="eventInvQuery" path="/users/[[user.uid]]/invites/eventInvites" app-name="myFireApp" data="{{eventsQry}}"></firebase-query>
-        <firebase-query id="list" path="/users" app-name="myFireApp""></firebase-query>
         <firebase-query id="friendInvQuery" path="/users/[[user.uid]]/invites/friendInvites" app-name="myFireApp" data="{{friendsQry}}"></firebase-query>
+        <firebase-query id="list" path="/users" app-name="myFireApp"></firebase-query>
 
 
         <div class="card">
@@ -49,8 +49,8 @@
                                             <div><b>[[event.fromName]]</b></div>
                                             <div>[[event.message]]</div>
                                         </div>
-                                        <iron-icon class="card-actions" icon="check" on-tap="_acceptEvent" data-item$="[[event]]"></iron-icon>
-                                        <iron-icon class="card-actions" icon="close" on-click="_declineEvent"></iron-icon>
+                                        <iron-icon class="card-actions" icon="check" on-tap="_acceptEvent" invite="[[event]]"></iron-icon>
+                                        <iron-icon class="card-actions" icon="close" on-tap="_declineEvent" invite="[[event]]"></iron-icon>
                                     </div>
                                 </paper-card>
                             </div>
@@ -119,22 +119,27 @@
                 }
             }
             _acceptEvent(event) {
-                var invStruct = JSON.parse(event.target.dataset.item);
+                var invStruct = event.currentTarget.invite;
+                console.log(invStruct);
                 //Update your event page.
                 var myEventRef = this.$.list.ref.child(this.user.uid).child("events").child("participatingEvents");
-                myEventRef.push().set({path: invStruct.path});
+                //myEventRef.push().set({path: invStruct.path});
                 //Update friend's event page.
-                var paths = invStruct.path.split("\\");
-                var hostEventRef = this.$.ref.child(paths[0]).child(paths[1]).child(paths[2]).child(paths[3]).child("players");
-                //This won't update it, just creates a new eleemnt.  Need to fix later.
-                hostEventRef.push().set({friend: this.user.displayName, status: "accepted", uid: this.user.uid});
+                var paths = invStruct.path.split("/");
+                var hostEventRef = this.$.list.ref.child(paths[1]).child(paths[2]).child(paths[3]).child(paths[4]).child(paths[5]).child(paths[6]);
+                //This won't update it, just creates a new element.  Need to fix later.
+                hostEventRef.on('value', function(snapshot) {
+                    console.log(snapshot.val());
+                    //snapshot.ref.update({friend: snapshot.val().friend, status: "accepted", uid: snapshot.val().uid});
+                });
+
+                //hostEventRef.push().set({friend: this.user.displayName, status: "accepted", uid: this.user.uid});
             }
             _declineEvent() {
                 //TODO;
             }
 
             _acceptFriend(event) {
-                //var invStruct = JSON.parse(event.target.dataset.item);
                 var invStruct = event.currentTarget.invite;
                 //Put your info in your friend's friendlist.
                 var friendRef = this.$.list.ref.child(invStruct.fromUid).child("friends");
