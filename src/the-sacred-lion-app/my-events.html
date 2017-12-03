@@ -197,7 +197,7 @@
             }
             #events {
                 width: 100%;
-                background-color: #deffff;
+                background-color: #c6dafc;
                 border-radius: 8px;
                 padding: 6px;
             }
@@ -304,7 +304,7 @@
                 return {"query":boardName, "type":"boardgame"};
             }
 
-            /* WHenever a game is selected, sends request to receive more game information, while prompting next dia. */
+            /* Whenever a game is selected, sends request to receive more game information, while prompting next dia. */
             _selectGameId(event) {
                 this.set("idParam", event.target.dataset.item);
                 this.$.boardGameIdAjax.generateRequest();

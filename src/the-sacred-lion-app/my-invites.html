@@ -13,9 +13,9 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
-<link rel="imoprt" href="../../bower_components/paper-item/paper-item.html">
-<link rel="imoprt" href="../../bower_components/paper-tabs/paper-tab.html">
-<link rel="imoprt" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs-icons.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
@@ -31,14 +31,14 @@
 
 
         <div class="card">
-            <h1>Invites</h1>
+            <!--<h1>Invites</h1>-->
             <paper-tabs selected="{{select}}">
-                <paper-tab on-click="_changeTabZero">Event Invites</paper-tab>
-                <paper-tab on-click="_changeTabOne">Friend Invites</paper-tab>
+                <paper-tab>Event Invites</paper-tab>
+                <paper-tab>Friend Invites</paper-tab>
             </paper-tabs>
 
             <iron-pages selected="[[select]]">
-                <div>
+                <div id="eventInvitesTab">
                     <iron-list id="allEventInv" items="[[eventsQry]]" as="event">
                         <template>
                             <div>
@@ -57,7 +57,7 @@
                         </template>
                     </iron-list>
                 </div>
-                <div>
+                <div id="friendInvitesTab">
                     <iron-list id="allFriendInv" items="[[friendsQry]]" as="friend">
                         <template>
                             <div>
@@ -98,6 +98,12 @@
             }
             paper-tabs {
                 cursor: pointer;
+                font-size: 1.5em;
+                color: #3367d6 ;
+                --paper-tabs-selection-bar-color: #FFB627;
+            }
+            paper-tab {
+                --paper-tab-ink: #FFB627;
             }
             iron-icon {
                  cursor: pointer;
@@ -153,13 +159,6 @@
                 //Declined.
                 var key = event.currentTarget.invite.$key;
                 this.$.list.ref.child(this.user.uid).child("invites").child("friendInvites").child(key).remove();
-            }
-
-            _changeTabZero() {
-                this.select = 0;
-            }
-            _changeTabOne() {
-                this.select = 1;
             }
         }
 
