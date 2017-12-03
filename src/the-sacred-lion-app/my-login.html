@@ -24,8 +24,9 @@
         <firebase-query app-name="myFireApp" id="query" path="/users"></firebase-query>
         <firebase-query app-name="myFireApp" id="query2" path="/users-private"></firebase-query>
 
-        <div id="welcomeUser" hidden$="[[!user]]">
-            <label>Welcome!</label>
+        <div id="loggedOn" hidden$="[[!user]]">
+            <h2>Welcome [[user.displayName]]</h2>
+            <paper-button on-tap="_signOut">Sign Out?</paper-button>
         </div>
         <div id="allTableData" hidden$="[[user]]">
             <table id="logInMaterial">
@@ -39,7 +40,7 @@
                 </tr>
                 <tr>
                     <td><paper-input id="logInPassword" type="password" label="Password" tabindex="2"></paper-input></td>
-                    <td><paper-input id="signUpUsername" label="Username" allowed-pattern='[A-Za-z0-9 '\.]+' tabindex="4"></paper-input></td>
+                    <td><paper-input id="signUpUsername" label="Username" allowed-pattern='[A-Za-z0-9 &apos;\.]+' tabindex="4"></paper-input></td>
                 </tr>
                 <tr>
                     <td><!--Filler--></td>
@@ -47,7 +48,7 @@
                     </paper-input></td>
                 </tr>
                 <tr>
-                    <td><!--Filler--></td>\
+                    <td><!--Filler--></td>
                     <td><paper-input id="passwordConfirm" type="password" label="Password Confirmation" tabindex="6">
                     </paper-input></td>
                 </tr>
@@ -84,7 +85,7 @@
                 margin-left: -10%;
             }
 
-            #welcomeUser {
+            #loggedOn {
                 position: fixed;
                 width: 20%;
                 z-index: 2;
@@ -92,7 +93,6 @@
                 left: 50%;
                 margin-top: -10%;
                 margin-left: -10%;
-                font-size: 180%;
             }
 
             #errContents {
@@ -135,8 +135,8 @@
                     this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
-                            this.signedInFirebase(response)
-                            //location.href = "/events";
+                            this.signedInFirebase(response);
+                            location.href = "/events";
                         }.bind(this))
                         .catch(function(error) {
                             //Handle errors.  I tried to put this in a function, however kept saying it wasn't defined.
@@ -187,7 +187,7 @@
             _closeErrDia() {
                 this.$.errorDia.close();
             }
-            signOut() {
+            _signOut() {
                 this.$.auth.signOut();
             }
             signedInFirebase(response){

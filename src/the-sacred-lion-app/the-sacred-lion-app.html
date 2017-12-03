@@ -96,7 +96,7 @@
                     </div>
 
                     <div id="userLinks" hidden$="[[!user]]"> <!--These links are hidden when you aren't logged in. -->
-                        <a name="sign-out" href="[[rootPath]]login" on-click="_signOut">Sign Out</a>
+                        <a name="sign-out" href="[[rootPath]]login">Sign Out</a>
                         <a name="events" href="[[rootPath]]events">Events</a>
                         <a name="invites" href="[[rootPath]]invites">Invites</a>
                         <a name="private-profile" href="[[rootPath]]private-profile">Private Profile</a>
@@ -117,8 +117,8 @@
                 </app-header>
 
                 <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
-                    <my-login id="auth" name="login" user="{{user}}"></my-login>
-                    <my-events name="events" user="{{user}}"></my-events>
+                    <my-login id="auth" name="login""></my-login>
+                    <my-events name="events""></my-events>
                     <my-invites name="invites"></my-invites>
                     <my-private-profile name="private-profile"></my-private-profile>
                     <my-public-profile name="public-profile" uid="[[subroute.__queryParams.uid]]"></my-public-profile>
@@ -180,9 +180,6 @@
 
             _showPage404() {
                 this.page = 'view404';
-            }
-            _signOut() {
-                this.$.auth.signOut();
             }
 
             _print(oldVal, newVal) {
