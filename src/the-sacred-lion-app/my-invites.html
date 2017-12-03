@@ -45,7 +45,10 @@
                                 <paper-card id="eventInv" class="layout vertical" elevation="2">
 
                                     <div class="layout horizontal">
-                                        <div class="flex">[[event.message]]</div>
+                                        <div class="flex">
+                                            <div><b>[[event.fromName]]</b></div>
+                                            <div>[[event.message]]</div>
+                                        </div>
                                         <iron-icon class="card-actions" icon="check" on-tap="_acceptEvent" data-item$="[[event]]"></iron-icon>
                                         <iron-icon class="card-actions" icon="close" on-click="_declineEvent"></iron-icon>
                                     </div>
@@ -60,8 +63,11 @@
                             <div>
                                 <paper-card id="friendInv" class="layout vertical" elevation="2">
                                     <div class="layout horizontal">
-                                        <div class="flex">[[friend.message]]</div>
-                                        <iron-icon class="card-actions" icon="check" on-tap="_acceptFriend" data-item$="[[friend]]"></iron-icon>
+                                        <div class="flex">
+                                            <div><b>[[friend.fromName]]</b></div>
+                                            <div>[[friend.message]]</div>
+                                        </div>
+                                        <iron-icon class="card-actions" icon="check" on-tap="_acceptFriend" invite="[[friend]]"></iron-icon>
                                         <iron-icon class="card-actions" icon="close" on-tap="_declineFriend" invite="[[friend]]"></iron-icon>
                                     </div>
                                 </paper-card>
@@ -128,17 +134,20 @@
             }
 
             _acceptFriend(event) {
-                var invStruct = JSON.parse(event.target.dataset.item);
+                //var invStruct = JSON.parse(event.target.dataset.item);
+                var invStruct = event.currentTarget.invite;
                 //Put your info in your friend's friendlist.
-                var friendRef = this.$.list.ref.child(invStruct.uid).child("friends");
+                var friendRef = this.$.list.ref.child(invStruct.fromUid).child("friends");
                 friendRef.push().set({friend: this.user.displayName, uid: this.user.uid});
                 //Put your friend's info in your friendlist.
                 var myRef = this.$.list.ref.child(this.user.uid).child("friends");
-                myRef.push().set({friend: invStruct.fromUser, uid: invStruct.fromUid});
+                myRef.push().set({friend: invStruct.fromName, uid: invStruct.fromUid});
+                //Remove the request after accepting it.
+                this.$.list.ref.child(this.user.uid).child("invites").child("friendInvites").child(invStruct.$key).remove();
             }
             _declineFriend(event) {
                 //Declined.
-                var key = event.currentTarget.friend.$key;
+                var key = event.currentTarget.invite.$key;
                 this.$.list.ref.child(this.user.uid).child("invites").child("friendInvites").child(key).remove();
             }
 

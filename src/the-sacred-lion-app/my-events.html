@@ -515,7 +515,7 @@
                     for(var i=0; i < this.participants.length; i++) {
                         var sendRef = this.$.msgQuery.ref.child(this.participants[i].uid).child("invites").child("eventInvites");
                         var gamePath = dbRef.toString().substr(44); //Chop off junk.
-                        sendRef.push().set({fromUser: this.user.displayName, fromUid: this.user.uid, message: "Come play " + this.gameName + " with me on "
+                        sendRef.push().set({fromName: this.user.displayName, fromUid: this.user.uid, message: "Come play " + this.gameName + " with me on "
                         + fmtDate + " at " + fmtTime + ".", path: gamePath});
                     }
 
