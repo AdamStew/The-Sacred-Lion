@@ -19,6 +19,14 @@
                 width: 25%;
                 left:25%;
             }
+
+            .success-text {
+              color: green
+            }
+
+            .pad-top {
+              padding-top: 10px;
+            }
         </style>
 
         <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
@@ -28,7 +36,7 @@
         <div class="card" id="userInfo">
             <h2>Private Profile | [[authUser.displayName]]</h2>
             <div>
-                <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z \.]+' value="{{user.name}}"></paper-input>
+                <paper-input id='userName' always-float-label auto-validate label="Screen Name (Shown Publicly)" allowed-pattern='[A-Za-z0-9 \.]+' value="{{user.name}}"></paper-input>
                 <paper-input id='userPhone' always-float-label label="Phone"
                              allowed-pattern='[0-9]+'
                              value="{{userPrivate.phone}}"></paper-input>
@@ -37,8 +45,9 @@
                     <input type='email'/>
                 </paper-input>
                 <paper-checkbox checked="{{userPrivate.shareEmail}}">Show Email Publicly</paper-checkbox>
-                <div>
+                <div class="pad-top">
                     <paper-button raised on-click="saveChanges">Save</paper-button>
+                    <span class="success-text" hidden$="[[!success]]">All Changes Saved!</span>
                 </div>
             </div>
         </div>
@@ -69,6 +78,10 @@
                         type: Object,
                         notify: true,
                         value: null,
+                    },
+                    success: {
+                      type: Boolean,
+                      value: false
                     }
                 };
             }
@@ -101,9 +114,13 @@
                 dbRef.child(this.authUser.uid).update(this.user);
                 dbRef2.update(this.userPrivate);
                 console.log(this.user.name);
-                this.authUser.updateProfile({displayName: this.user.name}).then(() => {
-                    this.notifyPath(this.authUser.displayName);
-                });
+                this.authUser.updateProfile({displayName: this.user.name})/*.then(() => {
+                    this.authUser.displayName = this.user.name;
+                    this.notifyPath('this.authUser.displayName');
+                });*/
+
+                this.set('success', true);
+                setTimeout(() => { this.set('success', false)}, 3000)
             }
         }
 
