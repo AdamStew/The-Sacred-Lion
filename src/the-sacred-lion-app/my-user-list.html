@@ -14,6 +14,7 @@
 <link rel="import" href="../../bower_components/polymerfire/firebase-app.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-user-list">
@@ -41,7 +42,7 @@
 
             paper-card {
                 width: 100%;
-                background-color: #4286f4;
+                background-color: var(--google-blue-500);
                 border-radius: 8px;
                 padding: 6px;
                 color: white;
@@ -54,10 +55,6 @@
 
             #userList {
                 padding: 10px;
-            }
-
-            #displayName {
-                font-size: 1.5em;
             }
         </style>
 
@@ -94,16 +91,18 @@
             sendFriendInvite(event) {
                 console.log(event);
                 const dbRef = this.$.query.ref;
-                let selectedUser = event.currentTarget.user.$key;
+                let selectedUserId = event.currentTarget.user.$key;
                 let selectedName = event.currentTarget.user.name;
                 let currentUserId = this.user.uid;
                 let currentName = this.user.displayName;
 
                 //Creates the friend invite on the selected user's invite page.
-                dbRef.child(selectedUser).child("invites").child("friendInvites").push().set({
-                    fromUid: currentUserId,
-                    fromName: currentName, message: selectedName + ", I want to be your friend."
-                });
+                if (selectedUserId !== currentUserId) {
+                    dbRef.child(selectedUserId).child("invites").child("friendInvites").push().set({
+                        fromUid: currentUserId,
+                        fromName: currentName, message: selectedName + ", I want to be your friend."
+                    });
+                }
             }
         }
 
