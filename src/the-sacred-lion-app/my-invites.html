@@ -126,12 +126,10 @@
                 //myEventRef.push().set({path: invStruct.path});
                 //Update friend's event page.
                 var paths = invStruct.path.split("/");
+                console.log(paths[6]);
                 var hostEventRef = this.$.list.ref.child(paths[1]).child(paths[2]).child(paths[3]).child(paths[4]).child(paths[5]).child(paths[6]);
                 //This won't update it, just creates a new element.  Need to fix later.
-                hostEventRef.on('value', function(snapshot) {
-                    console.log(snapshot.val());
-                    //snapshot.ref.update({friend: snapshot.val().friend, status: "accepted", uid: snapshot.val().uid});
-                });
+                hostEventRef.update({friend: this.user.displayName, status: "Accepted", uid: this.user.uid});
 
                 //hostEventRef.push().set({friend: this.user.displayName, status: "accepted", uid: this.user.uid});
             }
