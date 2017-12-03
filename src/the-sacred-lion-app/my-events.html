@@ -2,6 +2,7 @@
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-label/iron-label.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
@@ -15,6 +16,9 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
 <link rel="imoprt" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs-icons.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 <link rel="import" href="../../bower_components/google-map/google-map-marker.html">
 <link rel="import" href="../../bower_components/google-map/google-map-search.html">
@@ -32,6 +36,8 @@
 
         <firebase-auth id="auth" app-name="myFireApp" user="{{user}}"></firebase-auth>
         <firebase-query id="eventsQuery" path="/users/[[user.uid]]/events/hostEvents" app-name="myFireApp" data="{{qryData}}"></firebase-query>
+        <firebase-query id="participatingQuery" path="/users/[[user.uid]]/events/participatingEvents" app-name="myFireApp" data="{{partQry}}"></firebase-query>
+        <firebase-query id="otherEvents" path="{{realPath}}" app-name="myFireApp" data="{{realQry}}"></firebase-query>
         <firebase-query id="friendsQuery" path="/users/[[user.uid]]/friends" app-name="myFireApp" data="{{friendsQry}}"></firebase-query>
         <firebase-query id="msgQuery" path="/users" app-name="myFireApp" data="{{msgQry}}"></firebase-query>
 
@@ -57,38 +63,73 @@
 
         <div class="card">
             <div class="layout horizontal">
-                <h1 class="flex">Events</h1>
+                <paper-tabs class="flex" selected="{{select}}">
+                    <paper-tab>Events Hosting</paper-tab>
+                    <paper-tab>Events Participating</paper-tab>
+                </paper-tabs>
                 <iron-icon class="card-actions" icon="add" on-click="_createEvent"></iron-icon>
             </div>
-            <iron-list id="allEvents" items="[[qryData]]" as="event">
-                <template>
-                    <div id="eventList">
-                        <paper-card id="events" class="layout vertical" elevation="2">
-                            <h3>[[event.gameName]] - [[event.time.date]] @ [[event.time.timeOfDay]]</h3>
-                            <div class="layout horizontal-reverse">
-                                <div id="players" class="flex">
-                                    <h4>Players:</h4>
-                                    <iron-list id="inviteesList" items="[[event.players]]" as="invitees">
-                                        <template>
-                                            <div class="layout vertical">
-                                                <div><b>• [[invitees.friend]]</b></div>
-                                                <div><i>Status: [[invitees.status]]</i></div>
-                                                <br>
-                                            </div>
-                                        </template>
-                                    </iron-list>
-                                </div>
-                                <google-map latitude="[[event.location.latitude]]" longitude="[[event.location.longitude]]"
-                                            api-key="AIzaSyBlgE4O9hgijK1uAOARzCsP7zg3JICHybo" zoom="15" disable-default-ui>
-                                    <google-map-marker latitude="[[event.location.latitude]]"
-                                                       longitude="[[event.location.longitude]]"
-                                                       title="Game Night!"></google-map-marker>
-                                </google-map>
+
+
+            <iron-pages selected="[[select]]">
+                <div id="eventHosting">
+                    <iron-list id="allEvents" items="[[qryData]]" as="event">
+                        <template>
+                            <div id="eventList">
+                                <paper-card id="hosts" class="layout vertical" elevation="2">
+                                    <h3>[[event.gameName]] - [[event.time.date]] @ [[event.time.timeOfDay]]</h3>
+                                    <div class="layout horizontal-reverse">
+                                        <div id="players" class="flex">
+                                            <h4>Players:</h4>
+                                            <iron-list id="inviteesList" items="[[event.players]]" as="invitees">
+                                                <template>
+                                                    <div class="layout vertical">
+                                                        <div><b>• [[invitees.friend]]</b></div>
+                                                        <div><i>Status: [[invitees.status]]</i></div>
+                                                        <br>
+                                                    </div>
+                                                </template>
+                                            </iron-list>
+                                        </div>
+                                        <google-map latitude="[[event.location.latitude]]" longitude="[[event.location.longitude]]"
+                                                    api-key="AIzaSyBlgE4O9hgijK1uAOARzCsP7zg3JICHybo" zoom="15" disable-default-ui>
+                                            <google-map-marker latitude="[[event.location.latitude]]"
+                                                               longitude="[[event.location.longitude]]"
+                                                               title="Game Night!"></google-map-marker>
+                                        </google-map>
+                                    </div>
+                                </paper-card>
                             </div>
-                        </paper-card>
-                    </div>
-                </template>
-            </iron-list>
+                        </template>
+                    </iron-list>
+                </div>
+                <div id="eventParticipating">
+                    <iron-list id="allParticipating" items="[[partQry]]" as="participate">
+                        <template>
+                            <div id="participateList">
+                                <paper-card id="participating" class="layout vertical" elevation="2">
+                                    <h3>[[participate.gameInfo.gameName]] - [[participate.gameInfo.time.date]]
+                                        @ [[participate.gameInfo.time.timeOfDay]]</h3>
+                                    <div class="layout horizontal-reverse">
+                                        <div id="host" class="flex">
+                                            <h4>Host:</h4>
+                                            <i>[[participate.host]]</i>
+                                        </div>
+                                        <google-map latitude="[[participate.gameInfo.location.latitude]]"
+                                                    longitude="[[participate.gameInfo.location.longitude]]"
+                                                    api-key="AIzaSyBlgE4O9hgijK1uAOARzCsP7zg3JICHybo"
+                                                    zoom="15" disable-default-ui>
+                                            <google-map-marker latitude="[[participate.gameInfo.location.latitude]]"
+                                                               longitude="[[participate.gameInfo.location.longitude]]"
+                                                               title="Game Night!"></google-map-marker>
+                                        </google-map>
+                                    </div>
+                                </paper-card>
+                            </div>
+                        </template>
+                    </iron-list>
+                </div>
+            </iron-pages>
         </div>
 
         <div>
@@ -191,17 +232,39 @@
             paper-button {
                 width: 100%;
             }
+            paper-tabs {
+                cursor: pointer;
+                font-size: 1.5em;
+                color: #3367d6 ;
+                --paper-tabs-selection-bar-color: #FFB627;
+            }
+            paper-tab {
+                --paper-tab-ink: #FFB627;
+            }
             #allEvents {
                 height: 70vh;
                 width: 40vw;
             }
-            #events {
+            #allParticipating {
+                height: 70vh;
+                width: 40vw;
+            }
+            #hosts {
+                width: 100%;
+                background-color: #c6dafc;
+                border-radius: 8px;
+                padding: 6px;
+            }
+            #participating {
                 width: 100%;
                 background-color: #c6dafc;
                 border-radius: 8px;
                 padding: 6px;
             }
             #eventList {
+                padding: 10px;
+            }
+            #participateList {
                 padding: 10px;
             }
             #players {
@@ -239,6 +302,16 @@
 
             static get properties() {
                 return {
+                    select: {
+                        type: Number,
+                        value: 0
+                    },
+
+                    realPath: {
+                        type: String,
+                        value: ""
+                    },
+
                     searchParam: {
                         type: String,
                         computed: '_processParam(boardName)'
@@ -516,7 +589,8 @@
                         var sendRef = this.$.msgQuery.ref.child(this.participants[i].uid).child("invites").child("eventInvites");
                         var gamePath = dbRef.toString().substr(44); //Chop off junk.
                         sendRef.push().set({fromName: this.user.displayName, fromUid: this.user.uid, message: "Come play " + this.gameName + " with me on "
-                        + fmtDate + " at " + fmtTime + ".", path: gamePath+"/players/"+i});
+                            + fmtDate + " at " + fmtTime + ".", path: gamePath+"/players/"+i, gameInfo: {gameName: this.gameName,
+                            location: {longitude: this.longitude, latitude: this.latitude}, time: {date: fmtDate, timeOfDay: fmtTime}}});
                     }
 
                     //Clear all old data after a submission.

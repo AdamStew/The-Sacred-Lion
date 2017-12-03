@@ -136,7 +136,6 @@
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
                             this.signedInFirebase(response);
-                            location.href = "/events";
                         }.bind(this))
                         .catch(function(error) {
                             //Handle errors.  I tried to put this in a function, however kept saying it wasn't defined.

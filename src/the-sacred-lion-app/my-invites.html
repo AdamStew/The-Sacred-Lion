@@ -128,7 +128,7 @@
                 var invStruct = event.currentTarget.invite;
                 //Update your event page.
                 var myEventRef = this.$.list.ref.child(this.user.uid).child("events").child("participatingEvents");
-                myEventRef.push().set({path: invStruct.path});
+                myEventRef.push().set({host: invStruct.fromName, gameInfo: invStruct.gameInfo});
                 //Update friend's event page.
                 var paths = invStruct.path.split("/");
                 var hostEventRef = this.$.list.ref.child(paths[1]).child(paths[2]).child(paths[3]).child(paths[4]).child(paths[5]).child(paths[6]);
