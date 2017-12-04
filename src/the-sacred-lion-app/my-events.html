@@ -420,18 +420,38 @@
                     }
                 }
                 this.$.resName.innerHTML = this.playerInfos[this.index].friend;
+                this.$.eventsQuery.ref.child(resStruct.$key).update({status: 'completed'})
             }
 
             _finalizeResults() {
                 if(this.placing == "W") {
                     var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
-                    scoreRef.update({wins: 1}); //Change to wins++;
+                    scoreRef.once('value')
+                        .then((snap) => {
+                            let player = snap.val();                        
+                            scoreRef.update({
+                                wins: (player.wins || 0) + 1, //|| is null catch
+                                gamesPlayed: (player.gamesPlayed || 0) + 1
+                            });
+                        });
                 } else if(this.placing == "T") {
                     var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
-                    scoreRef.update({ties: 1}); //Change to ties++;
+                    scoreRef.once('value')
+                        .then((snap) => {
+                            let player = snap.val();                        
+                            scoreRef.update({
+                                ties: (player.ties || 0) + 1, //|| is null catch
+                                gamesPlayed: (player.gamesPlayed || 0) + 1
+                            });
+                        });
                 } else if(this.placing == "L") {
-                    var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
-                    scoreRef.update({losses: 1}); //Change to losses++;
+                    var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);                    
+                    scoreRef.once('value')
+                        .then((snap) => {
+                            let player = snap.val();                        
+                            scoreRef.update({
+                                gamesPlayed: (player.gamesPlayed || 0) + 1}) //no value for losses, simply gamesPlayed - wins - ties, //|| is null catch
+                        });
                 }
 
                 this.index++;

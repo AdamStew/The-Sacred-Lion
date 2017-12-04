@@ -135,6 +135,7 @@
                     this.$.auth.signInWithEmailAndPassword(this.$.logInEmail.value.trim(),
                         this.$.logInPassword.value.trim())
                         .then(function(response) {
+                            this.set('user', response)
                             this.signedInFirebase(response);
                         }.bind(this))
                         .catch(function(error) {
@@ -158,14 +159,11 @@
                     this.$.passwordConfirm.value != null && this.$.signUpUsername.value != null) {
                     //console.log("USERNAME: " + this.$.signUpEmail.value + " PASS: " + this.$.signUpPassword.value + " CONFIRM: " + this.$.passwordConfirm.value);
                     if(this.$.signUpPassword.value.trim() === this.$.passwordConfirm.value.trim()) {
-                        console.log("Passwords match!");
                         this.$.auth.createUserWithEmailAndPassword(this.$.signUpEmail.value.trim(),
                             this.$.signUpPassword.value.trim())
                             .then(function(response) {
+                                this.set('user', response)
                                 this.signedInFirebase(response);
-                                this.user.updateProfile({displayName: this.$.signUpUsername.value}).then(() => {
-                                    this.notifyPath(this.user.displayName);
-                                });
                             }.bind(this))
                             .catch(function(error) {
                                 if(error.code == "auth/user-not-found") {
@@ -197,7 +195,7 @@
                         let result = snap.val();
                         if(result === null){
                             dbRef.child(response.uid)
-                                .set({ name: resonse.email.split('@')[0] })
+                                .set({ name: this.$.signUpUsername.value })
                         }
                     });
                 dbRef2.child(response.uid)

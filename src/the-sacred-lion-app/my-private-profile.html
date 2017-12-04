@@ -30,7 +30,7 @@
         </style>
 
         <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
-        <firebase-query app-name="myFireApp" id="query" path="/users" equal-to="[[authUser.uid]]" data="{{qryData}}"></firebase-query>
+        <firebase-query app-name="myFireApp" id="query" path="/users/[[authUser.uid]]" data="{{qryData}}" on-error="ignoreError"></firebase-query>
         <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" data="{{qryData2}}"></firebase-query>
 
         <div class="card" id="userInfo">
@@ -41,7 +41,7 @@
                              allowed-pattern='[0-9]+'
                              value="{{userPrivate.phone}}"></paper-input>
                 <paper-checkbox checked="{{userPrivate.sharePhone}}">Show Phone Publicly</paper-checkbox>
-                <paper-input id='userEmail' always-float-label label="Email" value="{{userPrivate.email}}">
+                <paper-input id='userEmail' always-float-label label="Email (display only, login remains the same)" value="{{userPrivate.email}}">
                     <input type='email'/>
                 </paper-input>
                 <paper-checkbox checked="{{userPrivate.shareEmail}}">Show Email Publicly</paper-checkbox>
@@ -77,7 +77,7 @@
                     authUser: {
                         type: Object,
                         notify: true,
-                        value: null,
+                        value: null
                     },
                     success: {
                       type: Boolean,
@@ -86,8 +86,13 @@
                 };
             }
 
+            _print(oldVal, newVal){
+
+                console.log(oldVal, newVal)
+            }
+
             _setUser(oldVal, newVal){
-                this.user = oldVal[0];
+                this.user = _.fromPairs(_.map(oldVal, (m) => { return _.values(m); }));
             }
 
             _setUserPrivate(oldVal, newVal){
@@ -97,30 +102,65 @@
             saveChanges(){
                 var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
                 var dbRef2 = this.$.query2.ref;
-                delete this.user.$key
+                let notExistingUser = this.user.$key == null;
+                let notExistingPrivateUser = this.userPrivate.$key == null;
+                if(this.user.$key != null)
+                    delete this.user.$key
+                if(this.userPrivate.$key != null)
                 delete this.userPrivate.$key;
                 if(this.userPrivate.shareEmail){
                     this.user.email = this.userPrivate.email;
                 }else{
-                    delete this.user.email;
-                    dbRef.child(this.authUser.uid).child("email").remove();
+                    if(this.user.email != null)
+                        delete this.user.email;
+                    if(!notExistingUser)
+                        dbRef.child(this.authUser.uid).child("email").remove();
                 }
                 if(this.userPrivate.sharePhone){
                     this.user.phone = this.userPrivate.phone;
                 }else{
-                    delete this.user.phone;
-                    dbRef.child(this.authUser.uid).child("phone").remove();
+                    if(this.user.phone != null)
+                        delete this.user.phone;
+                    if(!notExistingPrivateUser)
+                        dbRef.child(this.authUser.uid).child("phone").remove();
                 }
-                dbRef.child(this.authUser.uid).update(this.user);
-                dbRef2.update(this.userPrivate);
-                console.log(this.user.name);
-                this.authUser.updateProfile({displayName: this.user.name})/*.then(() => {
-                    this.authUser.displayName = this.user.name;
-                    this.notifyPath('this.authUser.displayName');
-                });*/
+
+                let saveUser = {};
+                if(this.user.email != null)
+                    saveUser.email = this.user.email;
+                if(this.user.phone != null)
+                    saveUser.phone = this.user.phone;
+                if(this.user.name != null)
+                    saveUser.name = this.user.name;
+                let savePrivateUser = {};
+                if(this.userPrivate.email != null);
+                    savePrivateUser.email = this.userPrivate.email;
+                if(this.userPrivate.phone != null)
+                    savePrivateUser.phone = this.userPrivate.phone;
+                savePrivateUser.shareEmail = this.userPrivate.shareEmail || false;
+                savePrivateUser.sharePhone = this.userPrivate.phone || false;
+
+                if(!notExistingUser){
+                    dbRef.child(this.authUser.uid).update(saveUser);
+                }else{
+                    dbRef.child(this.authUser.uid).set(saveUser);
+                }
+                if(!notExistingPrivateUser){
+                    dbRef2.update(savePrivateUser);
+                }else{
+                    dbRef2.set(savePrivateUser);
+                }
+                this.authUser.updateProfile({displayName: this.user.name}).then(() => {
+                    //this.authUser.displayName = this.user.name;
+                    this.notifyPath('authUser.displayName');
+                });               
 
                 this.set('success', true);
                 setTimeout(() => { this.set('success', false)}, 3000)
+            }
+
+            ignoreError(){
+                return;
             }
         }
 
