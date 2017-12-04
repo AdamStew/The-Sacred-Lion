@@ -19,6 +19,8 @@
 <link rel="import" href="../../bower_components/paper-tabs/paper-tab.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs-icons.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 <link rel="import" href="../../bower_components/google-map/google-map-marker.html">
 <link rel="import" href="../../bower_components/google-map/google-map-search.html">
@@ -210,11 +212,14 @@
 
             <paper-dialog id="postRes" modal on-iron-overlay-opened="_patchOverlay">
                 <h1>Post Results</h1>
-                <div>Please enter result (i.e. W, L, or T).</div>
                 <div class="layout vertical">
                     <div class="layout vertical">
                         <div id="resName"></div>
-                        <paper-input id="placingInput" label="Placing" value="{{placing}}"></paper-input>
+                        <paper-radio-group selected="win">
+                            <paper-radio-button id="win" name="win">Win</paper-radio-button>
+                            <paper-radio-button id="tie" name="tie">Tie</paper-radio-button>
+                            <paper-radio-button id="loss" name="loss">Loss</paper-radio-button>
+                        </paper-radio-group>
                     </div>
                     <div class="layout horizontal">
                         <paper-button on-click="_closeRes">Cancel</paper-button>
@@ -334,11 +339,6 @@
                         value: []
                     },
 
-                    placing: {
-                        type: String,
-                        value: ""
-                    },
-
                     index: {
                         type: Number,
                         value: 0
@@ -419,36 +419,36 @@
                         this.push("playerInfos", resStruct.players[i]);
                     }
                 }
-                this.$.resName.innerHTML = this.playerInfos[this.index].friend;
+                this.$.resName.innerHTML = "Player: " + this.playerInfos[this.index].friend;
                 this.$.eventsQuery.ref.child(resStruct.$key).update({status: 'completed'})
             }
 
             _finalizeResults() {
-                if(this.placing == "W") {
+                if(this.$.win.active) {
                     var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
                     scoreRef.once('value')
                         .then((snap) => {
-                            let player = snap.val();                        
+                            let player = snap.val();
                             scoreRef.update({
                                 wins: (player.wins || 0) + 1, //|| is null catch
                                 gamesPlayed: (player.gamesPlayed || 0) + 1
                             });
                         });
-                } else if(this.placing == "T") {
+                } else if(this.$.tie.active) {
                     var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
                     scoreRef.once('value')
                         .then((snap) => {
-                            let player = snap.val();                        
+                            let player = snap.val();
                             scoreRef.update({
                                 ties: (player.ties || 0) + 1, //|| is null catch
                                 gamesPlayed: (player.gamesPlayed || 0) + 1
                             });
                         });
-                } else if(this.placing == "L") {
-                    var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);                    
+                } else if(this.$.loss.active) {
+                    var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
                     scoreRef.once('value')
                         .then((snap) => {
-                            let player = snap.val();                        
+                            let player = snap.val();
                             scoreRef.update({
                                 gamesPlayed: (player.gamesPlayed || 0) + 1}) //no value for losses, simply gamesPlayed - wins - ties, //|| is null catch
                         });
@@ -456,9 +456,10 @@
 
                 this.index++;
                 if(this.index < this.playerInfos.length) {
-                    this.$.resName.innerHTML = this.playerInfos[this.index].friend;
+                    this.$.resName.innerHTML = "Player: " + this.playerInfos[this.index].friend; //Display next player.
                 } else {
                     this.splice("playerInfos", 0, this.playerInfos.length); //Clear.
+                    this.index = 0;
                     this.$.postRes.close();
                     //Then you need to delete the event, since it's done now.
                 }
