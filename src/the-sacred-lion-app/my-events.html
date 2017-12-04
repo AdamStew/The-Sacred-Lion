@@ -77,7 +77,10 @@
                         <template>
                             <div id="eventList">
                                 <paper-card id="hosts" class="layout vertical" elevation="2">
-                                    <h3>[[event.gameName]] - [[event.time.date]] @ [[event.time.timeOfDay]]</h3>
+                                    <div class="layout horizontal">
+                                        <h3 class="flex">[[event.gameName]] - [[event.time.date]] @ [[event.time.timeOfDay]]</h3>
+                                        <iron-icon class="card-actions" icon="done-all" on-tap="_postResults" res="[[event]]"></iron-icon>
+                                    </div>
                                     <div class="layout horizontal-reverse">
                                         <div id="players" class="flex">
                                             <h4>Players:</h4>
@@ -108,8 +111,11 @@
                         <template>
                             <div id="participateList">
                                 <paper-card id="participating" class="layout vertical" elevation="2">
-                                    <h3>[[participate.gameInfo.gameName]] - [[participate.gameInfo.time.date]]
-                                        @ [[participate.gameInfo.time.timeOfDay]]</h3>
+                                    <div class="layout horizontal">
+                                        <h3 class="flex">[[participate.gameInfo.gameName]] - [[participate.gameInfo.time.date]]
+                                            @ [[participate.gameInfo.time.timeOfDay]]</h3>
+                                        <iron-icon class="card-actions" icon="close" on-tap="_removeEvent" res="[[participate]]"></iron-icon>
+                                    </div>
                                     <div class="layout horizontal-reverse">
                                         <div id="host" class="flex">
                                             <h4>Host:</h4>
@@ -198,6 +204,22 @@
                         <paper-button on-click="_confirmData">Confirm Time</paper-button>
                     </div>
                     <div id="dateNoResults"></div>
+                </div>
+
+            </paper-dialog>
+
+            <paper-dialog id="postRes" modal on-iron-overlay-opened="_patchOverlay">
+                <h1>Post Results</h1>
+                <div>Please enter result (i.e. W, L, or T).</div>
+                <div class="layout vertical">
+                    <div class="layout vertical">
+                        <div id="resName"></div>
+                        <paper-input id="placingInput" label="Placing" value="{{placing}}"></paper-input>
+                    </div>
+                    <div class="layout horizontal">
+                        <paper-button on-click="_closeRes">Cancel</paper-button>
+                        <paper-button on-click="_finalizeResults">Confirm</paper-button>
+                    </div>
                 </div>
             </paper-dialog>
         </div>
@@ -307,6 +329,21 @@
                         value: 0
                     },
 
+                    playerInfos: {
+                        type: Array,
+                        value: []
+                    },
+
+                    placing: {
+                        type: String,
+                        value: ""
+                    },
+
+                    index: {
+                        type: Number,
+                        value: 0
+                    },
+
                     realPath: {
                         type: String,
                         value: ""
@@ -370,6 +407,52 @@
                         value: false
                     }
                 };
+            }
+
+            _postResults(event) {
+                this.$.postRes.open();
+                var resStruct = event.currentTarget.res;
+                var players = [];
+                //Get all the players who participated.
+                for(var i=0; i < resStruct.players.length; i++) {
+                    if(resStruct.players[i].status == "accepted") {
+                        players.push(resStruct.players[i]);
+                        this.push("playerInfos", resStruct.players[i]);
+                    }
+                }
+                this.$.resName.innerHTML = this.playerInfos[this.index].friend;
+            }
+
+            _finalizeResults() {
+                if(this.placing == "W") {
+                    var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
+                    scoreRef.update({wins: 1}); //Change to wins++;
+                } else if(this.placing == "T") {
+                    var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
+                    scoreRef.update({ties: 1}); //Change to ties++;
+                } else if(this.placing == "L") {
+                    var scoreRef = this.$.msgQuery.ref.child(this.playerInfos[this.index].uid);
+                    scoreRef.update({losses: 1}); //Change to losses++;
+                }
+
+                this.index++;
+                if(this.index < this.playerInfos.length) {
+                    this.$.resName.innerHTML = this.playerInfos[this.index].friend;
+                } else {
+                    this.$.postRes.close();
+                    //Then you need to delete the event, since it's done now.
+                }
+            }
+
+            _closeRes() {
+                this.splice("playerInfos", 0, this.playerInfos.length); //Clear.
+                this.index = 0;
+                this.$.postRes.close();
+            }
+
+            _removeEvent(event) {
+                var key = event.currentTarget.res.$key;
+                this.$.msgQuery.ref.child(this.user.uid).child("events").child("participatingEvents").child(key).remove();
             }
 
             /* Whenever search input changes, change our parameters in the BoardGameGeek API. */
