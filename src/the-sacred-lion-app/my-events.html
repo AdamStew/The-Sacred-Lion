@@ -438,6 +438,7 @@
                 if(this.index < this.playerInfos.length) {
                     this.$.resName.innerHTML = this.playerInfos[this.index].friend;
                 } else {
+                    this.splice("playerInfos", 0, this.playerInfos.length); //Clear.
                     this.$.postRes.close();
                     //Then you need to delete the event, since it's done now.
                 }
