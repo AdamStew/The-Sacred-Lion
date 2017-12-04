@@ -412,11 +412,10 @@
             _postResults(event) {
                 this.$.postRes.open();
                 var resStruct = event.currentTarget.res;
-                var players = [];
                 //Get all the players who participated.
+                this.push("playerInfos", {friend: this.user.displayName, status: "accepted", uid: this.user.uid}); //Add yourself.
                 for(var i=0; i < resStruct.players.length; i++) {
                     if(resStruct.players[i].status == "accepted") {
-                        players.push(resStruct.players[i]);
                         this.push("playerInfos", resStruct.players[i]);
                     }
                 }
