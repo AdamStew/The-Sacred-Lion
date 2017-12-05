@@ -125,7 +125,7 @@
                     if(this.user.email != null)
                         delete this.user.email;
                     if(!notExistingUser)
-                        dbRef.child(this.authUser.uid).child("email").remove();
+                        dbRef.child("email").remove();
                 }
                 if(this.userPrivate.sharePhone){
                     this.user.phone = this.userPrivate.phone;
@@ -133,7 +133,7 @@
                     if(this.user.phone != null)
                         delete this.user.phone;
                     if(!notExistingPrivateUser)
-                        dbRef.child(this.authUser.uid).child("phone").remove();
+                        dbRef.child("phone").remove();
                 }
 
                 let saveUser = {};
