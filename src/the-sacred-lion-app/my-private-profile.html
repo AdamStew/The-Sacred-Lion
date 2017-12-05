@@ -102,8 +102,8 @@
             saveChanges(){
                 var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
                 var dbRef2 = this.$.query2.ref;
-                let notExistingUser = this.user.$key == null;
-                let notExistingPrivateUser = this.userPrivate.$key == null;
+                let notExistingUser = this.user == null;
+                let notExistingPrivateUser = this.userPrivate == null;
                 if(this.user.$key != null)
                     delete this.user.$key
                 if(this.userPrivate.$key != null)
