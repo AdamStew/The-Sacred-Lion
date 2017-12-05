@@ -5,161 +5,163 @@
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-public-profile">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
+    <template>
+            
+        <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
+        <firebase-query app-name="myFireApp" id="query" path="/users"></firebase-query>
 
-        padding: 10px;
-      }
-    </style>
-      
-    <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
-    <firebase-query app-name="myFireApp" id="query" path="/users"></firebase-query>
+        <div class="card">
+            <h1>[[user.name]] Profile</h1>
+            <div>
+                <div hidden$="[[hideEmail]]">Email: [[user.email]]</div>
+                <div hidden$="[[hidePhone]]">Phone: [[user.phone]]</div>
+            </div>
+        </div>
 
-    <div class="card">
-      <h1>[[user.name]] Profile</h1>
-      <div>
-        <div hidden$="[[hideEmail]]">Email: [[user.email]]</div>
-        <div hidden$="[[hidePhone]]">Phone: [[user.phone]]</div>
-      </div>
-    </div>
+        <div class="card">
+            <h1>Stats</h1>
+            <div>
+                <div>Games Played: [[gamesPlayed]]</div>
+                <div>Wins: [[wins]]</div>
+                <div>Ties: [[ties]]</div>
+                <div>Losses: [[losses]]</div>
+                <div>Average Win Rate: [[winRate]]%</div>
+            </div>
+        </div>
 
-    <div class="card">
-      <h1>Stats</h1>
-      <div>
-        <div>Games Played: [[gamesPlayed]]</div>
-        <div>Wins: [[wins]]</div>
-        <div>Ties: [[ties]]</div>
-        <div>Losses: [[losses]]</div>
-        <div>Average Win Rate: [[winRate]]%</div>
-      </div>
-    </div>
+        <style include="iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
 
-  </template>
+                padding: 10px;
+            }
+        </style>
 
-  <script>
-    class MyPublicProfile extends Polymer.Element {
-      static get is() { return 'my-public-profile'; }
-      static get properties() {
-        return {
-          authUser: {
-            type: Object,
-            notify: true,
-            value: null,
-            observer: "_runQuery",
-          },
-          uid: {
-            type: String,
-            observer: "_runQuery",
-          },
-          user: {
-              type: Object,
-              value: { wins: 0, gamesPlayed: 0, ties: 0 }
-          },
-          hideEmail: {
-            type: Boolean,
-            computed: "_hideEmail(user.email)",
-          },
-          hidePhone: {
-            type: Boolean,
-            computed: "_hidePhone(user.phone)"
-          },
-          winRate: {
-            type: Number,
-            value: 0,
-            computed: "_winRate(user.gamesPlayed)"
-          },
-          losses: {
-            type: Number,
-            value: 0,
-            computed: "_losses(user.gamesPlayed)"
-          },
-          ties: {
-            type: Number,
-            value: 0,
-            computed: "_ties(user.gamesPlayed)"
-          },
-          wins: {
-            type: Number,
-            value: 0,
-            computed: "_wins(user.gamesPlayed)"
-          },
-          gamesPlayed: {
-            type: Number,
-            value: 0,
-            computed: "_gamesPlayed(user.gamesPlayed)"
-          }
-        };
-      }
+    </template>
 
-      _print(oldVal, newVal){
-        console.log(oldVal, newVal);
-      }
+    <script>
+        class MyPublicProfile extends Polymer.Element {
+            static get is() { return 'my-public-profile'; }
+            static get properties() {
+                return {
+                    authUser: {
+                        type: Object,
+                        notify: true,
+                        value: null,
+                        observer: "_runQuery",
+                    },
+                    uid: {
+                        type: String,
+                        observer: "_runQuery",
+                    },
+                    user: {
+                            type: Object,
+                            value: { wins: 0, gamesPlayed: 0, ties: 0 }
+                    },
+                    hideEmail: {
+                        type: Boolean,
+                        computed: "_hideEmail(user.email)",
+                    },
+                    hidePhone: {
+                        type: Boolean,
+                        computed: "_hidePhone(user.phone)"
+                    },
+                    winRate: {
+                        type: Number,
+                        value: 0,
+                        computed: "_winRate(user.gamesPlayed)"
+                    },
+                    losses: {
+                        type: Number,
+                        value: 0,
+                        computed: "_losses(user.gamesPlayed)"
+                    },
+                    ties: {
+                        type: Number,
+                        value: 0,
+                        computed: "_ties(user.gamesPlayed)"
+                    },
+                    wins: {
+                        type: Number,
+                        value: 0,
+                        computed: "_wins(user.gamesPlayed)"
+                    },
+                    gamesPlayed: {
+                        type: Number,
+                        value: 0,
+                        computed: "_gamesPlayed(user.gamesPlayed)"
+                    }
+                };
+            }
 
-      _hideEmail() {
-        return this.user == null || this.user.email == null || this.user.email.trim().length <= 0;
-      }
+            _print(oldVal, newVal){
+                console.log(oldVal, newVal);
+            }
 
-      _hidePhone() {
-        return this.user == null || this.user.phone == null || this.user.phone.trim().length <= 0;
-      }
+            _hideEmail() {
+                return this.user == null || this.user.email == null || this.user.email.trim().length <= 0;
+            }
 
-      effectiveUid() {
-        return this.uid || (this.authUser != null ? this.authUser.uid : null);
-      }
+            _hidePhone() {
+                return this.user == null || this.user.phone == null || this.user.phone.trim().length <= 0;
+            }
 
-      _updateUid(){
-        this.set('uid', effectiveUid());
-      }
+            effectiveUid() {
+                return this.uid || (this.authUser != null ? this.authUser.uid : null);
+            }
 
-      _winRate(){
-        if(this.user != null && this.user.gamesPlayed != null && this.user.wins != null){
-          return Math.round(100*(this.user.wins/this.user.gamesPlayed));  
-        }      
-        return 0;
-      }
+            _updateUid(){
+                this.set('uid', effectiveUid());
+            }
 
-      _losses(){
-        if(this.user != null && this.user.gamesPlayed != null){
-          return this.user.gamesPlayed - (this.user.wins || 0) - (this.user.ties || 0);
+            _winRate(){
+                if(this.user != null && this.user.gamesPlayed != null && this.user.wins != null){
+                    return Math.round(100*(this.user.wins/this.user.gamesPlayed));    
+                }            
+                return 0;
+            }
+
+            _losses(){
+                if(this.user != null && this.user.gamesPlayed != null){
+                    return this.user.gamesPlayed - (this.user.wins || 0) - (this.user.ties || 0);
+                }
+                return 0;
+            }
+
+            _ties(){
+                if(this.user != null && this.user.ties != null){
+                    return this.user.ties;
+                }
+                return 0;
+            }
+
+            _wins(){
+                if(this.user != null && this.user.wins != null){
+                    return this.user.wins;
+                }
+                return 0;
+            }
+
+            _gamesPlayed(){
+                if(this.user != null && this.user.gamesPlayed != null){
+                    return this.user.gamesPlayed;
+                }
+                return 0;
+            }
+
+            _runQuery(){
+                if(this.authUser != null){
+                    this.$.query.ref
+                        .child(this.effectiveUid())
+                        .once('value', (snap) => {
+                            this.set('user', snap.val());
+                        });
+                }
+            }
+            
         }
-        return 0;
-      }
 
-      _ties(){
-        if(this.user != null && this.user.ties != null){
-          return this.user.ties;
-        }
-        return 0;
-      }
-
-      _wins(){
-        if(this.user != null && this.user.wins != null){
-          return this.user.wins;
-        }
-        return 0;
-      }
-
-      _gamesPlayed(){
-        if(this.user != null && this.user.gamesPlayed != null){
-          return this.user.gamesPlayed;
-        }
-        return 0;
-      }
-
-      _runQuery(){
-        if(this.authUser != null){
-          this.$.query.ref
-            .child(this.effectiveUid())
-            .once('value', (snap) => {
-              this.set('user', snap.val());
-            });
-        }
-      }
-      
-    }
-
-    window.customElements.define(MyPublicProfile.is, MyPublicProfile);
-  </script>
+        window.customElements.define(MyPublicProfile.is, MyPublicProfile);
+    </script>
 </dom-module>

@@ -41,7 +41,7 @@
                 <div id="eventInvitesTab">
                     <iron-list id="allEventInv" items="[[eventsQry]]" as="event">
                         <template>
-                            <div>
+                            <div id="eventInvList">
                                 <paper-card id="eventInv" class="layout vertical" elevation="2">
 
                                     <div class="layout horizontal">
@@ -60,7 +60,7 @@
                 <div id="friendInvitesTab">
                     <iron-list id="allFriendInv" items="[[friendsQry]]" as="friend">
                         <template>
-                            <div>
+                            <div id="friendInvList">
                                 <paper-card id="friendInv" class="layout vertical" elevation="2">
                                     <div class="layout horizontal">
                                         <div class="flex">
@@ -92,7 +92,7 @@
             }
             paper-card {
                 width: 100%;
-                background-color: #deffff;
+                background-color: #c6dafc;
                 border-radius: 8px;
                 padding: 6px;
             }
@@ -108,6 +108,12 @@
             iron-icon {
                  cursor: pointer;
              }
+            #eventInvList {
+                padding: 10px;
+            }
+            #friendInvList {
+                padding: 10px;
+            }
 
         </style>
     </template>

@@ -190,7 +190,7 @@
                 <iron-list items="[[friendsQry]]" as="item">
                     <template>
                         <div>
-                            <paper-button id="friendRes" toggles raised class="red" on-tap="_sendInvites" data-item$="[[item]]">[[item.friend]]</paper-button>
+                            <paper-button id="friendRes" toggles raised on-tap="_sendInvites" data-item$="[[item]]">[[item.friend]]</paper-button>
                         </div>
                     </template>
                 </iron-list>
@@ -249,6 +249,10 @@
             paper-dialog {
                 padding-left: 240px;
                 padding-right: 240px;
+                border: 2px solid #4b91af;
+                border-radius: 8px;
+                background-color: #cce5f8;
+                color: #4b91af;
             }
             time-element {
                 padding: 8px;
@@ -258,6 +262,16 @@
             }
             paper-button {
                 width: 100%;
+                border-radius: 8px;
+                background-color: var(--paper-indigo-500);
+                color: white;
+                --paper-button-raised-keyboard-focus: {
+                    background-color: var(--paper-pink-a200);
+                    color: white;
+                };
+            }
+            paper-button[active] {
+                background-color: #4b91af;
             }
             paper-tabs {
                 cursor: pointer;
@@ -298,13 +312,13 @@
                 padding: 8px;
             }
             #bgNoResults {
-                color: red;
+                color: #8b55ff;
             }
             #locNoResults {
-                color: red;
+                color: #8b55ff;
             }
             #dateNoResults {
-                color: red;
+                color: #8b55ff;
             }
             #inviteesList {
                 height: 25vh;
