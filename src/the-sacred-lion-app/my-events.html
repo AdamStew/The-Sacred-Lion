@@ -651,7 +651,6 @@
 
             /* Goes backwards a dialog. */
             _backToLocation() {
-                this.splice("participants", 0, this.participants.length); //Clear out old results.
                 this.$.pickParticipants.close();
                 this.$.pickLocation.open();
             }
@@ -715,6 +714,7 @@
                     this.splice("locResults", 0, this.locResults.length);
                     this.$.locationInput.value = "";
                     this.$.locNoResults.hidden = true;
+                    this.splice("participants", 0, this.participants.length);
                     this.$.dateSelected.value = "";
                     this.$.dateNoResults.hidden = true;
                 }

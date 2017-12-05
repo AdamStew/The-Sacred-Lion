@@ -204,6 +204,11 @@
             }
             _signOut() {
                 this.$.auth.signOut();
+                this.$.logInPassword.value = "";
+                this.$.signUpUsername.value = "";
+                this.$.signUpPassword.value = "";
+                this.$.passwordConfirm.value = "";
+                this.$.signUpEmail.value = "";
             }
             signedInFirebase(response){
                 var dbRef = this.$.query.ref; //this.$.myFireApp.app.database();
