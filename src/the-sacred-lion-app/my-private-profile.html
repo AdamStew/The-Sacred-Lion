@@ -141,9 +141,9 @@
                 savePrivateUser.sharePhone = this.userPrivate.phone || false;
 
                 if(!notExistingUser){
-                    dbRef.child(this.authUser.uid).update(saveUser);
+                    dbRef.update(saveUser);
                 }else{
-                    dbRef.child(this.authUser.uid).set(saveUser);
+                    dbRef.set(saveUser);
                 }
                 if(!notExistingPrivateUser){
                     dbRef2.update(savePrivateUser);
