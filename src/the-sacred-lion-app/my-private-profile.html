@@ -10,6 +10,17 @@
 <dom-module id="my-private-profile">
     <template>
         <style include="shared-styles">
+            paper-button {
+                width: 100%;
+                border-radius: 8px;
+                background-color: var(--paper-indigo-500);
+                color: white;
+                --paper-button-raised-keyboard-focus: {
+                    background-color: var(--paper-pink-a200);
+                    color: white;
+                };
+            }
+
             :host {
                 display: block;
                 padding: 10px;

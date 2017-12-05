@@ -77,7 +77,7 @@
                 <div id="eventHosting">
                     <iron-list id="allEvents" items="[[qryData]]" as="event">
                         <template>
-                            <div id="eventList">
+                            <div id="eventList" class="padThis">
                                 <paper-card id="hosts" class="layout vertical" elevation="2">
                                     <div class="layout horizontal">
                                         <h3 class="flex">[[event.gameName]] - [[event.time.date]] @ [[event.time.timeOfDay]]</h3>
@@ -111,7 +111,7 @@
                 <div id="eventParticipating">
                     <iron-list id="allParticipating" items="[[partQry]]" as="participate">
                         <template>
-                            <div id="participateList">
+                            <div id="participateList" class="padThis">
                                 <paper-card id="participating" class="layout vertical" elevation="2">
                                     <div class="layout horizontal">
                                         <h3 class="flex">[[participate.gameInfo.gameName]] - [[participate.gameInfo.time.date]]
@@ -153,7 +153,7 @@
                 </div>
                 <iron-list items="[[bgResults]]" as="item">
                     <template>
-                        <div>
+                        <div class="padThis">
                             <paper-button id="bgRes" on-tap="_selectGameId" data-item$="[[item.id]]">[[item.name]]</paper-button>
                         </div>
                     </template>
@@ -172,7 +172,7 @@
                 </div>
                 <iron-list items="[[locResults]]" as="item">
                     <template>
-                        <div>
+                        <div class="padThis">
                             <paper-button id="locRes" on-tap="_selectLocation" data-item$="[[item]]">[[item.address]]</paper-button>
                         </div>
                     </template>
@@ -189,7 +189,7 @@
                 </div>
                 <iron-list items="[[friendsQry]]" as="item">
                     <template>
-                        <div>
+                        <div class="padThis">
                             <paper-button id="friendRes" toggles raised on-tap="_sendInvites" data-item$="[[item]]">[[item.friend]]</paper-button>
                         </div>
                     </template>
@@ -282,6 +282,9 @@
             paper-tab {
                 --paper-tab-ink: #FFB627;
             }
+            div.padThis {
+                padding: 5px;
+            }
             #allEvents {
                 height: 70vh;
                 width: 40vw;
@@ -301,12 +304,6 @@
                 background-color: #c6dafc;
                 border-radius: 8px;
                 padding: 6px;
-            }
-            #eventList {
-                padding: 10px;
-            }
-            #participateList {
-                padding: 10px;
             }
             #players {
                 padding: 8px;
