@@ -25,8 +25,11 @@
         <firebase-query app-name="myFireApp" id="query2" path="/users-private"></firebase-query>
 
         <div id="loggedOn" hidden$="[[!user]]">
-            <h2>Welcome [[user.displayName]]</h2>
-            <paper-button on-tap="_signOut">Sign Out?</paper-button>
+            <table>
+                <tr><td align="center"><img src="the-sacred-lion.jpg"  height="213" width="320"></td></tr>
+                <tr><td align="center"><h2>Welcome [[user.displayName]]</h2></td></tr>
+                <tr><td align="center"><paper-button on-tap="_signOut">Sign Out?</paper-button></td></tr>
+            </table>
         </div>
         <div id="allTableData" hidden$="[[user]]">
             <table id="logInMaterial">
@@ -96,7 +99,7 @@
             }
 
             #errContents {
-                color: indianred;
+                color: #8b55ff;
             }
 
             td {
@@ -110,10 +113,25 @@
 
             paper-dialog {
                 padding: 10px;
+                border: 2px solid #4b91af;
+                border-radius: 8px;
+                background-color: #cce5f8;
+                color: #4b91af;
             }
 
             iron-icon {
                 cursor: pointer;
+            }
+
+            paper-button {
+                width: 100%;
+                border-radius: 8px;
+                background-color: var(--paper-indigo-500);
+                color: white;
+                --paper-button-raised-keyboard-focus: {
+                    background-color: var(--paper-pink-a200);
+                    color: white;
+                };
             }
 
         </style>
