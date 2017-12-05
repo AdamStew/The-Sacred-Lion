@@ -48,6 +48,10 @@
                 color: white;
             }
 
+            iron-icon:hover {
+                --iron-icon-fill-color: black;
+            }
+
             .layout {
                 display: flex;
                 align-items: flex-start;
@@ -80,6 +84,13 @@
                 </template>
             </iron-list>
         </div>
+        <div id="dialogs">
+            <paper-dialog id="friendRequestDia">
+                <div class="flex">A friend request has been sent to <span id="requestName"></span></div>
+                <!--<paper-button dialog-dismiss=""></paper-button>-->
+                <div class="layout horizontal flex"><paper-button class="flex" dialog-confirm="">Ok</paper-button></div>
+            </paper-dialog>
+        </div>
     </template>
 
     <script>
@@ -95,6 +106,7 @@
                 let selectedName = event.currentTarget.user.name;
                 let currentUserId = this.user.uid;
                 let currentName = this.user.displayName;
+                this.$.requestName.innerHTML = selectedName;
 
                 //Creates the friend invite on the selected user's invite page.
                 if (selectedUserId !== currentUserId) {
@@ -102,6 +114,7 @@
                         fromUid: currentUserId,
                         fromName: currentName, message: selectedName + ", I want to be your friend."
                     });
+                    this.$.friendRequestDia.open();
                 }
             }
         }
