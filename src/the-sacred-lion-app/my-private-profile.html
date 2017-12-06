@@ -2,14 +2,22 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
 <link rel="import" href="../../bower_components/polymerfire/firebase-query.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-overlay-behavior/iron-overlay-behavior.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="shared-styles.html">
 
 <dom-module id="my-private-profile">
     <template>
-        <style include="shared-styles">
+        <style include="shared-styles iron-flex iron-flex-alignment iron-flex-factors iron-flex-reverse">
             paper-button {
                 width: 100%;
                 border-radius: 8px;
@@ -19,6 +27,15 @@
                     background-color: var(--paper-pink-a200);
                     color: white;
                 };
+            }
+
+            paper-card {
+                width: 95%;
+                background-color: var(--google-blue-500);
+                border-radius: 8px;
+                padding: 6px;
+                margin: 5px;
+                color: white;
             }
 
             :host {
@@ -43,7 +60,9 @@
         <firebase-auth app-name="myFireApp" id="auth" user="{{authUser}}" provider="email" on-error="handleError"></firebase-auth>
         <firebase-query app-name="myFireApp" id="query" path="/users/[[authUser.uid]]" data="{{qryData}}" on-error="ignoreError"></firebase-query>
         <firebase-query app-name="myFireApp" id="query2" path="/users-private/[[authUser.uid]]" data="{{qryData2}}"></firebase-query>
+        <firebase-query app-name="myFireApp" id="friendQuery" path="/users/[[authUser.uid]]/friends" data="{{friendData}}"></firebase-query>
 
+        <div class="layout horizontal">
         <div class="card" id="userInfo">
             <h2>Private Profile | [[authUser.displayName]]</h2>
             <div>
@@ -61,6 +80,26 @@
                     <span class="success-text" hidden$="[[!success]]">All Changes Saved!</span>
                 </div>
             </div>
+        </div>
+        <div class="card" id="friendsList">
+            <h2>Friends List</h2>
+            <iron-list items="[[friendData]]" as="friends">
+                <template>
+                    <div id="friendList">
+                        <paper-card elevation="2">
+                            <div class="layout horizontal">
+                                <div class="flex">[[friends.friend]]</div>
+                                <div class="cardActions">
+                                    <a href="/public-profile?uid=[[friends.uid]]">
+                                        <iron-icon icon="account-box"></iron-icon>
+                                    </a>
+                                </div>
+                            </div>
+                        </paper-card>
+                    </div>
+                </template>
+            </iron-list>
+        </div>
         </div>
     </template>
 
