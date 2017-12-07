@@ -31,7 +31,7 @@
         <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-private-profile.html">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="194">
-              <caret line="41" column="26" lean-forward="false" selection-start-line="41" selection-start-column="26" selection-end-line="41" selection-end-column="26" />
+              <caret line="41" column="29" lean-forward="true" selection-start-line="41" selection-start-column="29" selection-end-line="41" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -193,7 +193,7 @@
       <workItem from="1512598570888" duration="4947000" />
       <workItem from="1512603672373" duration="425000" />
       <workItem from="1512604107627" duration="8000" />
-      <workItem from="1512605120897" duration="923000" />
+      <workItem from="1512605120897" duration="1118000" />
     </task>
     <task id="LOCAL-00001" summary="Added friend invites to the user list page. I will add a proper button and dialog soon, instead of an iron-icon.">
       <created>1512248513753</created>
@@ -244,11 +244,18 @@
       <option name="project" value="LOCAL" />
       <updated>1512604002959</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Stopped the private profile card from being enlongated by the friends list.">
+      <created>1512606085373</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1512606085374</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="129353000" />
+    <option name="totallyTimeSpent" value="129548000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -296,7 +303,8 @@
     <MESSAGE value="Added some CSS and a paper-dialog to the user-list page." />
     <MESSAGE value="Add a friends list to the private profile." />
     <MESSAGE value="Added a fixed height for the iron-list." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added a fixed height for the iron-list." />
+    <MESSAGE value="Stopped the private profile card from being enlongated by the friends list." />
+    <option name="LAST_COMMIT_MESSAGE" value="Stopped the private profile card from being enlongated by the friends list." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -635,7 +643,7 @@
     <entry file="file://$PROJECT_DIR$/src/the-sacred-lion-app/my-private-profile.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="194">
-          <caret line="41" column="26" lean-forward="false" selection-start-line="41" selection-start-column="26" selection-end-line="41" selection-end-column="26" />
+          <caret line="41" column="29" lean-forward="true" selection-start-line="41" selection-start-column="29" selection-end-line="41" selection-end-column="29" />
           <folding />
         </state>
       </provider>
